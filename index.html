@@ -485,6 +485,7 @@ body::before {
 
 <!-- ══ TRAILER ══ -->
 <audio id="t-audio" src="music/trailer.mp3" preload="auto" loop></audio>
+<audio id="t-vo"    src="music/vo.mp3"      preload="auto"></audio>
 
 <div id="trailer">
   <div class="t-watermark">CAJERO 231 · VR · UNREAL ENGINE 5</div>
@@ -497,7 +498,7 @@ body::before {
       <div class="t-music-bar"></div><div class="t-music-bar"></div>
       <div class="t-music-bar"></div>
     </div>
-    <span>Fuzzeke — Without A Care</span>
+    <span>Fuzzeke · Ciro (VO)</span>
   </div>
   <button class="t-skip" id="t-skip" onclick="skipTrailer()">SKIP ›</button>
   <button class="t-close" id="t-close" onclick="closeTrailer()">✕ CERRAR</button>
@@ -543,37 +544,49 @@ function closeLB()   { document.getElementById('lb').classList.remove('open'); d
 
 /* ── TRAILER ── */
 const SCENES = [
-  { img:'imgs/ss/00003.png', title:'UN SUPERMERCADO.',       sub:'' },
-  { img:'imgs/ss/00011.png', title:'TU ÚNICA MISIÓN.',       sub:'' },
-  { img:'imgs/ss/00000.png', title:'LOS CLIENTES LLEGAN.',   sub:'' },
-  { img:'imgs/ss/00001.png', title:'ESCANEA SUS PRODUCTOS.', sub:'El precio sube en tiempo real' },
-  { img:'imgs/ss/00005.png', title:'',                       sub:'' },
-  { img:'imgs/ss/00006.png', title:'CADA PRODUCTO CUENTA.',  sub:'' },
-  { img:'imgs/ss/00007.png', title:'',                       sub:'' },
-  { img:'imgs/ss/00010.png', title:'PRECIO: 2,00 €',         sub:'Actualizado en pantalla' },
-  { img:'imgs/ss/00008.png', title:'ENTREGA LA BOLSA.',      sub:'El cliente puede marcharse' },
-  { img:'imgs/ss/00002.png', title:'',                       sub:'' },
-  { img:'imgs/ss/00004.png', title:'',                       sub:'' },
+  { img:'imgs/ss/00003.png' },
+  { img:'imgs/ss/00011.png' },
+  { img:'imgs/ss/00000.png' },
+  { img:'imgs/ss/00001.png' },
+  { img:'imgs/ss/00005.png' },
+  { img:'imgs/ss/00006.png' },
+  { img:'imgs/ss/00007.png' },
+  { img:'imgs/ss/00010.png' },
+  { img:'imgs/ss/00008.png' },
+  { img:'imgs/ss/00002.png' },
+  { img:'imgs/ss/00004.png' },
   { img: null, isTitle:true },
 ];
 const SCENE_DUR = 3500;
 let tTimer = null, tCurrent = 0;
-const audio = document.getElementById('t-audio');
+const audioMusic = document.getElementById('t-audio');
+const audioVO    = document.getElementById('t-vo');
 let audioFadeTimer = null;
 
 function audioFadeIn() {
   clearInterval(audioFadeTimer);
-  audio.volume = 0; audio.play().catch(()=>{});
+  // Music ducked to 0.22 while VO plays; VO at full volume
+  audioMusic.volume = 0; audioMusic.play().catch(()=>{});
+  audioVO.volume = 0; audioVO.currentTime = 0; audioVO.play().catch(()=>{});
   audioFadeTimer = setInterval(() => {
-    if (audio.volume < 0.78) audio.volume = Math.min(0.78, audio.volume + 0.04);
-    else clearInterval(audioFadeTimer);
+    let done = true;
+    if (audioMusic.volume < 0.22) { audioMusic.volume = Math.min(0.22, audioMusic.volume + 0.02); done = false; }
+    if (audioVO.volume    < 1.0)  { audioVO.volume    = Math.min(1.0,  audioVO.volume    + 0.06); done = false; }
+    if (done) clearInterval(audioFadeTimer);
   }, 80);
 }
 function audioFadeOut(cb) {
   clearInterval(audioFadeTimer);
   audioFadeTimer = setInterval(() => {
-    if (audio.volume > 0.03) audio.volume = Math.max(0, audio.volume - 0.06);
-    else { clearInterval(audioFadeTimer); audio.pause(); audio.currentTime = 0; if(cb) cb(); }
+    let done = true;
+    if (audioMusic.volume > 0.02) { audioMusic.volume = Math.max(0, audioMusic.volume - 0.03); done = false; }
+    if (audioVO.volume    > 0.02) { audioVO.volume    = Math.max(0, audioVO.volume    - 0.05); done = false; }
+    if (done) {
+      clearInterval(audioFadeTimer);
+      audioMusic.pause(); audioMusic.currentTime = 0;
+      audioVO.pause();    audioVO.currentTime = 0;
+      if (cb) cb();
+    }
   }, 60);
 }
 
@@ -624,7 +637,13 @@ function tSetScene(n) {
     document.getElementById('t-close').classList.add('show');
     document.getElementById('t-skip').style.display='none';
     document.getElementById('t-music-ind').style.display='none';
-    audioFadeOut();
+    // Fade out VO; let music rise back to full for the title card
+    clearInterval(audioFadeTimer);
+    audioFadeTimer = setInterval(() => {
+      if (audioVO.volume    > 0.02) audioVO.volume    = Math.max(0, audioVO.volume    - 0.04);
+      if (audioMusic.volume < 0.65) audioMusic.volume = Math.min(0.65, audioMusic.volume + 0.03);
+      if (audioVO.volume <= 0.02 && audioMusic.volume >= 0.65) { audioVO.pause(); clearInterval(audioFadeTimer); }
+    }, 80);
   }
   const img = document.querySelector(`#tsc-${n} .t-img`);
   if(img){ img.style.animation='none'; void img.offsetWidth; img.style.animation='kenburns 5.5s ease-out forwards'; }
