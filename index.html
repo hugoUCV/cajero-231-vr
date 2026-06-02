@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cajero 231 — Simulador VR</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0e1a;
+  --blue: #0ea5e9;
+  --blue-dim: rgba(14,165,233,0.15);
+  --blue-border: rgba(14,165,233,0.25);
+  --green: #22d3ee;
+  --orange: #f97316;
+  --red: #ef4444;
+  --purple: #a855f7;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --card: rgba(13,18,30,0.97);
+}
+
+html, body { height: 100%; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; user-select: none; }
+
+/* Blueprint grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(14,165,233,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,165,233,0.05) 1px, transparent 1px),
+    linear-gradient(rgba(14,165,233,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14,165,233,0.02) 1px, transparent 1px);
+  background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.presentation { position: relative; width: 100vw; height: 100vh; z-index: 1; }
+
+/* ——— SLIDES ——— */
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 72px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.slide.active { opacity: 1; pointer-events: all; }
+
+/* ——— NAV ——— */
+.nav {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 100;
+  background: rgba(10,14,26,0.85);
+  padding: 9px 22px;
+  border-radius: 40px;
+  border: 1px solid var(--blue-border);
+  backdrop-filter: blur(12px);
+}
+
+.nav-btn {
+  width: 34px; height: 34px;
+  border: 1px solid var(--blue-border);
+  background: transparent;
+  color: var(--blue);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  line-height: 1;
+}
+.nav-btn:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+.dots { display: flex; gap: 6px; align-items: center; }
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 3px;
+  background: var(--muted);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.dot.active { width: 22px; background: var(--blue); }
+
+.slide-counter { font-size: 12px; color: var(--muted); font-family: 'Courier New', monospace; width: 38px; text-align: center; }
+
+/* ——— KEYBOARD HINT ——— */
+.hint {
+  position: fixed;
+  top: 22px; right: 22px;
+  font-size: 11px;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  z-index: 100;
+  display: flex; gap: 6px; align-items: center;
+  background: rgba(10,14,26,0.6);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.hint kbd {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 1px 6px; border-radius: 3px;
+  font-family: inherit; font-size: 11px;
+}
+
+/* ——— SHARED COMPONENTS ——— */
+.slide-inner { width: 100%; max-width: 1060px; display: flex; flex-direction: column; gap: 28px; }
+
+.slide-header { display: flex; align-items: center; gap: 14px; }
+
+.slide-num {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--blue);
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-border);
+  padding: 4px 10px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.slide-title { font-size: clamp(22px, 3.5vw, 38px); font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.slide-title span { color: var(--blue); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+/* Cards */
+.card {
+  background: var(--card);
+  border: 1px solid var(--blue-border);
+  border-radius: 10px;
+  padding: 18px;
+  display: flex; flex-direction: column; gap: 8px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.card:hover { border-color: var(--blue); transform: translateY(-2px); }
+.card-icon { font-size: 24px; }
+.card h3 { font-size: 15px; font-weight: 700; color: #fff; }
+.card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* BP Table */
+.bp-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.bp-table th {
+  background: var(--blue-dim);
+  color: var(--blue);
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 9px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--blue-border);
+}
+.bp-table td { padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+.bp-table tr:last-child td { border-bottom: none; }
+.bp-table tr:hover td { background: rgba(14,165,233,0.04); }
+.bp-name { font-family: 'Courier New', monospace; color: var(--green); font-weight: 600; font-size: 13px; }
+.bp-desc { color: var(--muted); }
+
+/* Flow */
+.flow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.flow-step {
+  background: var(--card);
+  border: 1px solid var(--blue-border);
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13px; font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.flow-step:hover { border-color: var(--blue); color: var(--blue); }
+.flow-step.highlight { border-color: rgba(34,211,238,0.5); color: var(--green); }
+.flow-step.end { border-color: rgba(14,165,233,0.6); color: var(--blue); font-size: 14px; }
+.flow-arrow { color: var(--blue); opacity: 0.5; font-size: 18px; }
+
+/* Code block */
+.code {
+  background: #060a14;
+  border: 1px solid var(--blue-border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  font-family: 'Courier New', monospace;
+  font-size: 12.5px;
+  line-height: 1.9;
+  color: #cdd9e5;
+}
+.code .k { color: var(--blue); }
+.code .v { color: var(--green); }
+.code .c { color: var(--muted); }
+.code .f { color: #d2a8ff; }
+.code .s { color: var(--orange); }
+
+/* Step list */
+.steps { display: flex; flex-direction: column; gap: 8px; }
+.step {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--blue-border);
+  border-radius: 8px;
+}
+.step-n {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: #fff;
+  font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.step-text { font-size: 13px; color: var(--text); flex: 1; }
+.step-code {
+  margin-left: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: var(--green);
+  background: rgba(34,211,238,0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Prob / Sol */
+.prob-grid { display: flex; flex-direction: column; gap: 10px; }
+.prob-card {
+  background: var(--card);
+  border: 1px solid var(--blue-border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.prob-side { border-left: 3px solid var(--red); padding-left: 12px; }
+.sol-side  { border-left: 3px solid var(--green); padding-left: 12px; }
+.prob-side h4 { color: var(--red);   font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+.sol-side  h4 { color: var(--green); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+.prob-side p, .sol-side p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.sol-side code { font-family: 'Courier New', monospace; color: var(--green); font-size: 12px; }
+
+/* Gallery */
+.gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
+.gitem {
+  border: 1px solid var(--blue-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #040810;
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+.gitem:hover { border-color: var(--blue); }
+.gitem img { width: 100%; height: 130px; object-fit: cover; display: block; transition: opacity 0.2s; }
+.gitem:hover img { opacity: 0.9; }
+.glabel {
+  padding: 7px 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 10.5px;
+  color: var(--muted);
+  border-top: 1px solid var(--blue-border);
+}
+
+/* Lightbox */
+.lb {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.93);
+  z-index: 999;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 32px;
+}
+.lb.open { display: flex; }
+.lb img { max-width: 96%; max-height: 88vh; border-radius: 6px; border: 1px solid var(--blue-border); }
+.lb-close {
+  position: absolute; top: 18px; right: 22px;
+  color: #fff; font-size: 30px;
+  cursor: pointer; background: none; border: none;
+  line-height: 1; font-weight: 300;
+  opacity: 0.7; transition: opacity 0.2s;
+}
+.lb-close:hover { opacity: 1; }
+
+/* Portada */
+.portada { text-align: center; gap: 20px; }
+.portada-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-border);
+  color: var(--blue);
+  padding: 5px 16px;
+  border-radius: 40px;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.portada-tag .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); animation: blink 1.4s ease-in-out infinite; }
+.portada h1 {
+  font-size: clamp(56px, 11vw, 116px);
+  font-weight: 900;
+  letter-spacing: -3px;
+  background: linear-gradient(135deg, #fff 20%, var(--blue) 60%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 0.9;
+}
+.portada-sub { font-size: clamp(16px, 2.2vw, 24px); color: var(--muted); font-weight: 300; letter-spacing: 3px; }
+.portada-chips { display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+.chip {
+  padding: 8px 20px;
+  border: 1px solid var(--blue-border);
+  border-radius: 8px;
+  background: var(--blue-dim);
+  font-size: 13px;
+}
+.chip .cl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 2px; }
+.chip .cv { color: var(--blue); font-weight: 700; }
+
+/* Fin */
+.fin { text-align: center; gap: 18px; }
+.fin h2 {
+  font-size: clamp(40px, 7vw, 80px);
+  font-weight: 900;
+  background: linear-gradient(135deg, #fff 0%, var(--blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.fin p { font-size: 17px; color: var(--muted); }
+.fin-stats { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 16px; }
+.stat {
+  padding: 12px 24px;
+  border: 1px solid var(--blue-border);
+  border-radius: 10px;
+  background: var(--blue-dim);
+  text-align: center;
+  min-width: 130px;
+}
+.stat .sv { font-size: 28px; font-weight: 900; line-height: 1; }
+.stat .sl { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+/* Animations */
+@keyframes float  { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+@keyframes blink  { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+.float { animation: float 3.5s ease-in-out infinite; display: inline-block; }
+</style>
+</head>
+<body>
+
+<div class="hint"><kbd>←</kbd> <kbd>→</kbd> para navegar · <kbd>Space</kbd> siguiente · <kbd>Esc</kbd> cerrar imagen</div>
+
+<div class="presentation">
+
+  <!-- ───── SLIDE 1 · Portada ───── -->
+  <div class="slide active portada" data-index="0">
+    <span class="float" style="font-size:76px;margin-bottom:4px">🛒</span>
+    <div class="portada-tag"><span class="dot"></span>Asignatura de Realidad Virtual</div>
+    <h1>CAJERO 231</h1>
+    <p class="portada-sub">Simulador de Caja en Realidad Virtual</p>
+    <div class="portada-chips">
+      <div class="chip"><span class="cl">Motor</span><span class="cv">Unreal Engine 5</span></div>
+      <div class="chip"><span class="cl">Scripting</span><span class="cv">Blueprints</span></div>
+      <div class="chip"><span class="cl">Género</span><span class="cv">Simulación VR</span></div>
+    </div>
+  </div>
+
+  <!-- ───── SLIDE 2 · Concepto ───── -->
+  <div class="slide" data-index="1">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <span class="slide-num">02</span>
+        <h2 class="slide-title">¿De qué va el <span>juego</span>?</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="card">
+          <div class="card-icon">🧑‍💼</div>
+          <h3>Tú eres el cajero</h3>
+          <p>El jugador está detrás de una caja de supermercado en VR. Los clientes llegan solos, esperan su turno y tú procesas su compra.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">📦</div>
+          <h3>Escanea los productos</h3>
+          <p>Cada cliente trae entre 1 y 6 productos aleatorios. Tienes que pasar cada uno por el escáner físico para que el precio se sume al total.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🛍️</div>
+          <h3>Entrega la bolsa</h3>
+          <p>Cuando todos los productos están escaneados, los artículos desaparecen y aparece una bolsa. La llevas a la zona de entrega para que el cliente se vaya.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔁</div>
+          <h3>Flujo continuo e infinito</h3>
+          <p>En cuanto un cliente termina y sale, el sistema espera 2 segundos y genera automáticamente el siguiente. La caja nunca para.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── SLIDE 3 · Arquitectura ───── -->
+  <div class="slide" data-index="2">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <span class="slide-num">03</span>
+        <h2 class="slide-title">Arquitectura de <span>Blueprints</span></h2>
+      </div>
+      <table class="bp-table">
+        <thead>
+          <tr>
+            <th>Blueprint</th>
+            <th>Responsabilidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="bp-name">BP_GestorClientes</span></td><td class="bp-desc">Controlador central: spawnea, cicla y destruye clientes</td></tr>
+          <tr><td><span class="bp-name">BP_Cliente</span></td><td class="bp-desc">IA de cada cliente individual — AI Move To a espera y salida</td></tr>
+          <tr><td><span class="bp-name">BP_SistemaCaja</span></td><td class="bp-desc">Genera la compra aleatoria y lleva el conteo de escaneados</td></tr>
+          <tr><td><span class="bp-name">BP_Escaner</span></td><td class="bp-desc">Detecta productos por colisión, reproduce BEEP y suma precio</td></tr>
+          <tr><td><span class="bp-name">BP_Producto</span></td><td class="bp-desc">Actor de cada producto — almacena precio y flag de escaneado</td></tr>
+          <tr><td><span class="bp-name">BP_BolsaCompra</span></td><td class="bp-desc">Representa el pedido completo listo para entregar</td></tr>
+          <tr><td><span class="bp-name">BP_ZonaClienteEspera</span></td><td class="bp-desc">Trigger que detecta al cliente y lanza GenerarCompra()</td></tr>
+          <tr><td><span class="bp-name">BP_ZonaEntrega</span></td><td class="bp-desc">Trigger que detecta la bolsa y finaliza el ciclo de compra</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ───── SLIDE 4 · Flujo del cliente ───── -->
+  <div class="slide" data-index="3">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <span class="slide-num">04</span>
+        <h2 class="slide-title">Flujo del <span>Cliente</span></h2>
+      </div>
+      <div class="flow" style="margin-bottom:4px;">
+        <div class="flow-step">🧑 Spawn</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">🚶 Ir a Espera</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">📋 Generar Pedido</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">⏳ Esperar Escaneado</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">🛍️ Recibir Bolsa</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">🚪 Ir a Salida</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step highlight">🗑️ Destruirse</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step end">🔄 Nuevo Cliente</div>
+      </div>
+      <div class="two-col">
+        <div class="code">
+<span class="c">// GestorClientes — ClienteTerminado()</span>
+<span class="k">PedidoYaGenerado</span> = <span class="v">false</span>
+<span class="f">Delay</span>(<span class="v">2.0s</span>)
+<span class="f">SpawnearCliente</span>()
+<span class="c">  ↳ SpawnActor(BP_Cliente, SpawnPoint)</span>
+<span class="c">  ↳ SET GestorRef · DondeEsperar · DondeIrse</span>
+<span class="c">  ↳ IniciarCliente()</span>
+        </div>
+        <div class="code">
+<span class="c">// Cliente — PedidoEntregado()</span>
+<span class="f">AI_MoveTo</span>(<span class="k">DondeIrse</span>)
+  → <span class="f">IsValid</span>(GestorRef)?
+    → <span class="f">ClienteTerminado</span>()
+    → <span class="f">DestroyActor</span>(self)
+
+<span class="c">// Cliente — IniciarCliente()</span>
+<span class="f">AI_MoveTo</span>(<span class="k">DondeEsperar</span>)
+  → llega a BP_ZonaClienteEspera
+  → <span class="f">GenerarCompra</span>()
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── SLIDE 5 · Generación de compra ───── -->
+  <div class="slide" data-index="4">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <span class="slide-num">05</span>
+        <h2 class="slide-title">Sistema de <span>Caja</span> — Generar Compra</h2>
+      </div>
+      <div class="two-col">
+        <div class="steps">
+          <div class="step">
+            <div class="step-n">1</div>
+            <div class="step-text">Limpiar estado anterior del cliente previo</div>
+            <div class="step-code">ProductosEscaneados = 0</div>
+          </div>
+          <div class="step">
+            <div class="step-n">2</div>
+            <div class="step-text">Generar cantidad aleatoria de productos</div>
+            <div class="step-code">Random(1 → 6)</div>
+          </div>
+          <div class="step">
+            <div class="step-n">3</div>
+            <div class="step-text">Bucle For — calcular posición y spawnear BP_Producto</div>
+            <div class="step-code">ForLoop</div>
+          </div>
+          <div class="step">
+            <div class="step-n">4</div>
+            <div class="step-text">Guardar referencia de cada producto en array</div>
+            <div class="step-code">Array.Add()</div>
+          </div>
+          <div class="step">
+            <div class="step-n">5</div>
+            <div class="step-text">Esperar a que el jugador escanee todos</div>
+            <div class="step-code">Escaneados ≥ Totales</div>
+          </div>
+          <div class="step">
+            <div class="step-n">6</div>
+            <div class="step-text">Destruir productos y spawnear bolsa</div>
+            <div class="step-code">CompletarCompra()</div>
+          </div>
+        </div>
+        <div class="code">
+<span class="c">// BP_SistemaCaja — GenerarCompra()</span>
+<span class="k">ProductosEscaneados</span>.<span class="f">CLEAR</span>()
+<span class="k">ProductosTotales</span> = <span class="f">RandomInt</span>(<span class="v">1</span>, <span class="v">6</span>)
+
+<span class="f">ForLoop</span>(<span class="v">0</span> → <span class="k">ProductosTotales</span>-<span class="v">1</span>):
+  loc = <span class="f">CalcularPosicion</span>(i)
+  p   = <span class="f">SpawnActor</span>(BP_Producto, loc)
+  <span class="k">ProductosGenerados</span>.<span class="f">Add</span>(p)
+
+<span class="c">// CompletarCompra()</span>
+<span class="f">ForEachLoop</span>(<span class="k">ProductosGenerados</span>):
+  <span class="f">DestroyActor</span>(item)
+
+<span class="f">SpawnActor</span>(BP_BolsaCompra,
+  <span class="f">GetWorldTransform</span>(<span class="k">SpawnBolsa</span>))
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── SLIDE 6 · Escaneado ───── -->
+  <div class="slide" data-index="5">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <span class="slide-num">06</span>
+        <h2 class="slide-title">Sistema de <span>Escaneado</span></h2>
+      </div>
+      <div class="two-col">
+        <div class="steps">
+          <div class="step">
+            <div class="step-n">1</div>
+            <div class="step-text">Objeto entra en el volumen de colisión del escáner</div>
+          </div>
+          <div class="step">
+            <div class="step-n">2</div>
+            <div class="step-text">¿Tiene el tag <code style="color:var(--green);font-family:'Courier New'">"Producto"</code>? Si no → ignorar</div>
+          </div>
+          <div class="step">
+            <div class="step-n">3</div>
+            <div class="step-text">Cast a BP_Producto · comprobar flag <code style="color:var(--orange);font-family:'Courier New'">YaEscaneado</code></div>
+          </div>
+          <div class="step">
+            <div class="step-n">4</div>
+            <div class="step-text">Marcar como escaneado · reproducir BEEP 🔊</div>
+            <div class="step-code">YaEscaneado = true</div>
+          </div>
+          <div class="step">
+            <div class="step-n">5</div>
+            <div class="step-text">Obtener precio · sumar al acumulado · actualizar UI</div>
+            <div class="step-code">Total += precio</div>
+          </div>
+          <div class="step">
+            <div class="step-n">6</div>
+            <div class="step-text">Incrementar contador · si ≥ total → CompletarCompra()</div>
+            <div class="step-code">RegistrarProducto()</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="code">
+<span class="c">// BP_Escaner — OnComponentBeginOverlap</span>
+<span class="f">if</span> Actor.<span class="f">HasTag</span>(<span class="s">"Producto"</span>):
+  producto = <span class="f">CastTo</span>(BP_Producto)
+  <span class="f">if not</span> producto.<span class="k">YaEscaneado</span>:
+    producto.<span class="k">YaEscaneado</span> = <span class="v">true</span>
+    <span class="f">PlaySound</span>(BEEP)
+    <span class="k">Total</span> += producto.<span class="k">Precio</span>
+    <span class="f">UpdateText</span>(<span class="k">Total</span>)
+    SistemaCaja.<span class="f">RegistrarProducto</span>()
+          </div>
+          <div class="code">
+<span class="c">// RegistrarProductoEscaneado()</span>
+<span class="k">ProductosEscaneados</span>++
+
+<span class="f">if</span> <span class="k">ProductosEscaneados</span>
+   >= <span class="k">ProductosTotales</span>:
+  <span class="f">CompletarCompra</span>()
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── SLIDE 7 · Blueprints galería 1 ───── -->
+  <div class="slide" data-index="6">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <span class="slide-num">07</span>
+        <h2 class="slide-title">Blueprints en <span>Acción</span></h2>
+      </div>
+      <div class="gallery">
+        <div class="gitem" onclick="openLB('imgs/BP_GestorClientes.png')">
+          <img src="imgs/BP_GestorClientes.png" alt="BP_GestorClientes">
+          <div class="glabel">BP_GestorClientes — Spawn y ciclo de clientes</div>
+        </div>
+        <div class="gitem" onclick="openLB('imgs/BP_Cliente.png')">
+          <img src="imgs/BP_Cliente.png" alt="BP_Cliente">
+          <div class="glabel">BP_Cliente — AI MoveTo · IniciarCliente / PedidoEntregado</div>
+        </div>
+        <div class="gitem" onclick="openLB('imgs/Funcion_SpawnearCliente_BP_GestorClientes.png')">
+          <img src="imgs/Funcion_SpawnearCliente_BP_GestorClientes.png" alt="SpawnearCliente">
+          <div class="glabel">SpawnearCliente() — Instanciar y configurar cliente nuevo</div>
+        </div>
+        <div class="gitem" onclick="openLB('imgs/Funcion_RegistrarProductoEscaneado_BP_SistemaCaja.png')">
+          <img src="imgs/Funcion_RegistrarProductoEscaneado_BP_SistemaCaja.png" alt="RegistrarProducto">
+          <div class="glabel">RegistrarProductoEscaneado() — Conteo y disparo de CompletarCompra</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── SLIDE 8 · Blueprints galería 2 ───── -->
+  <div class="slide" data-index="7">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <span class="slide-num">08</span>
+        <h2 class="slide-title">Más <span>Blueprints</span></h2>
+      </div>
+      <div class="gallery">
+        <div class="gitem" onclick="openLB('imgs/Funcion_GenerarCompra_BP_SistemaCaja.png')">
+          <img src="imgs/Funcion_GenerarCompra_BP_SistemaCaja.png" alt="GenerarCompra">
+          <div class="glabel">GenerarCompra() — Random, ForLoop y spawn de productos</div>
+        </div>
+        <div class="gitem" onclick="openLB('imgs/Funcion_ClompetarCompra_BP_SistemaCaja.png')">
+          <img src="imgs/Funcion_ClompetarCompra_BP_SistemaCaja.png" alt="CompletarCompra">
+          <div class="glabel">CompletarCompra() — Destruir productos y spawnear bolsa</div>
+        </div>
+        <div class="gitem" onclick="openLB('imgs/BP_ZonaClienteEspera.png')">
+          <img src="imgs/BP_ZonaClienteEspera.png" alt="ZonaClienteEspera">
+          <div class="glabel">BP_ZonaClienteEspera — Trigger de inicio de compra (PedidoYaGenerado)</div>
+        </div>
+        <div class="gitem" onclick="openLB('imgs/BP_BolsaCompra.png')">
+          <img src="imgs/BP_BolsaCompra.png" alt="BolsaCompra">
+          <div class="glabel">BP_BolsaCompra — Verificación de bolsa y PedidoEntregado()</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── SLIDE 9 · Problemas ───── -->
+  <div class="slide" data-index="8">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <span class="slide-num">09</span>
+        <h2 class="slide-title">Problemas y <span>Soluciones</span></h2>
+      </div>
+      <div class="prob-grid">
+        <div class="prob-card">
+          <div class="prob-side">
+            <h4>🐛 Problema</h4>
+            <p>Un mismo cliente generaba varios pedidos al entrar repetidamente en la zona de espera</p>
+          </div>
+          <div class="sol-side">
+            <h4>✅ Solución</h4>
+            <p>Flag booleano <code>PedidoYaGenerado</code> — solo lanza GenerarCompra() si es <code>false</code></p>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-side">
+            <h4>🐛 Problema</h4>
+            <p>Un producto se sumaba al total varias veces si entraba y salía del volumen del escáner</p>
+          </div>
+          <div class="sol-side">
+            <h4>✅ Solución</h4>
+            <p>Flag en cada producto: <code>YaEscaneado</code> — bloquea cualquier segunda detección</p>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-side">
+            <h4>🐛 Problema</h4>
+            <p>Al terminar un cliente no aparecía el siguiente — no había ningún mecanismo de reposición</p>
+          </div>
+          <div class="sol-side">
+            <h4>✅ Solución</h4>
+            <p>Sistema de notificación: <code>ClienteTerminado()</code> → reset + Delay 2s → nuevo <code>SpawnearCliente()</code></p>
+          </div>
+        </div>
+        <div class="prob-card">
+          <div class="prob-side">
+            <h4>🐛 Problema</h4>
+            <p>Cualquier actor que entrase en BP_ZonaEntrega activaba la finalización incorrectamente</p>
+          </div>
+          <div class="sol-side">
+            <h4>✅ Solución</h4>
+            <p>Cast específico a <code>BP_BolsaCompra</code> — si falla el cast, la zona ignora el actor</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───── SLIDE 10 · Fin ───── -->
+  <div class="slide fin" data-index="9">
+    <span class="float" style="font-size:76px">🎮</span>
+    <h2>¡Demo en vivo!</h2>
+    <p>Cajero 231 — Simulador VR de Supermercado en Unreal Engine 5</p>
+    <div class="fin-stats">
+      <div class="stat">
+        <div class="sv" style="color:var(--blue)">8</div>
+        <div class="sl">Blueprints</div>
+      </div>
+      <div class="stat">
+        <div class="sv" style="color:var(--green)">1–6</div>
+        <div class="sl">Productos / cliente</div>
+      </div>
+      <div class="stat">
+        <div class="sv" style="color:var(--orange)">4</div>
+        <div class="sl">Bugs resueltos</div>
+      </div>
+      <div class="stat">
+        <div class="sv" style="color:var(--purple)">∞</div>
+        <div class="sl">Flujo de clientes</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─── NAV ─── -->
+<div class="nav">
+  <button class="nav-btn" id="btn-prev" onclick="prev()" disabled>←</button>
+  <div class="dots" id="dots"></div>
+  <span class="slide-counter" id="counter">1 / 10</span>
+  <button class="nav-btn" id="btn-next" onclick="next()">→</button>
+</div>
+
+<!-- ─── LIGHTBOX ─── -->
+<div class="lb" id="lb" onclick="closeLB()">
+  <button class="lb-close" onclick="closeLB()">×</button>
+  <img id="lb-img" src="" alt="" onclick="event.stopPropagation()">
+</div>
+
+<script>
+const slides = Array.from(document.querySelectorAll('.slide'));
+const N = slides.length;
+let cur = 0;
+
+const dotsEl    = document.getElementById('dots');
+const counterEl = document.getElementById('counter');
+const btnPrev   = document.getElementById('btn-prev');
+const btnNext   = document.getElementById('btn-next');
+
+// build dots
+slides.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.onclick = () => go(i);
+  dotsEl.appendChild(d);
+});
+
+function ui() {
+  document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+  counterEl.textContent = `${cur + 1} / ${N}`;
+  btnPrev.disabled = cur === 0;
+  btnNext.disabled = cur === N - 1;
+}
+
+function go(n) {
+  if (n < 0 || n >= N || n === cur) return;
+  slides[cur].classList.remove('active');
+  cur = n;
+  slides[cur].classList.add('active');
+  ui();
+}
+
+function next() { go(cur + 1); }
+function prev() { go(cur - 1); }
+
+document.addEventListener('keydown', e => {
+  if (document.getElementById('lb').classList.contains('open')) {
+    if (e.key === 'Escape') closeLB();
+    return;
+  }
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); next(); }
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); prev(); }
+});
+
+// Touch swipe
+let tx = 0;
+document.addEventListener('touchstart', e => tx = e.touches[0].clientX, {passive: true});
+document.addEventListener('touchend',   e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 50) dx < 0 ? next() : prev();
+}, {passive: true});
+
+// Lightbox
+function openLB(src) { document.getElementById('lb-img').src = src; document.getElementById('lb').classList.add('open'); }
+function closeLB()   { document.getElementById('lb').classList.remove('open'); document.getElementById('lb-img').src = ''; }
+</script>
+</body>
+</html>
