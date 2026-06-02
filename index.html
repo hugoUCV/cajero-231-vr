@@ -3,30 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cajero 231 — Simulador VR</title>
+<title>Cajero 231 — Nacho & Hugo VR Experiences</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg: #080c17;
-  --blue: #0ea5e9;
-  --blue-dim: rgba(14,165,233,0.14);
-  --blue-border: rgba(14,165,233,0.22);
-  --green: #22d3ee;
-  --orange: #f97316;
-  --red: #ef4444;
-  --purple: #a855f7;
-  --text: #e2e8f0;
-  --muted: #64748b;
-  --card: rgba(10,15,28,0.96);
+  --bg: #080c17; --blue: #0ea5e9; --blue-dim: rgba(14,165,233,0.13);
+  --blue-border: rgba(14,165,233,0.22); --green: #22d3ee; --orange: #f97316;
+  --red: #ef4444; --purple: #a855f7; --gold: #c9a84c;
+  --text: #e2e8f0; --muted: #64748b; --card: rgba(10,15,28,0.96);
 }
-
 html, body { height: 100%; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; user-select: none; }
-
-/* Blueprint grid */
 body::before {
-  content: '';
-  position: fixed; inset: 0;
+  content: ''; position: fixed; inset: 0;
   background-image:
     linear-gradient(rgba(14,165,233,0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(14,165,233,0.04) 1px, transparent 1px),
@@ -36,40 +24,14 @@ body::before {
   pointer-events: none; z-index: 0;
 }
 
-/* ══════════════════════════════
-   SLIDES
-══════════════════════════════ */
+/* ═══ SLIDES ═══ */
 .presentation { position: relative; width: 100vw; height: 100vh; z-index: 1; }
-
-.slide {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 48px 72px;
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.45s ease;
-}
+.slide { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 72px; opacity: 0; pointer-events: none; transition: opacity 0.45s ease; }
 .slide.active { opacity: 1; pointer-events: all; }
 
-/* ══════════════════════════════
-   NAV
-══════════════════════════════ */
-.nav {
-  position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%);
-  display: flex; align-items: center; gap: 12px;
-  z-index: 200;
-  background: rgba(8,12,23,0.88);
-  padding: 8px 20px; border-radius: 40px;
-  border: 1px solid var(--blue-border);
-  backdrop-filter: blur(14px);
-}
-.nav-btn {
-  width: 32px; height: 32px;
-  border: 1px solid var(--blue-border); background: transparent;
-  color: var(--blue); border-radius: 50%; cursor: pointer;
-  font-size: 14px; display: flex; align-items: center; justify-content: center;
-  transition: all 0.18s;
-}
+/* ═══ NAV ═══ */
+.nav { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; z-index: 200; background: rgba(8,12,23,0.88); padding: 7px 18px; border-radius: 40px; border: 1px solid var(--blue-border); backdrop-filter: blur(14px); }
+.nav-btn { width: 30px; height: 30px; border: 1px solid var(--blue-border); background: transparent; color: var(--blue); border-radius: 50%; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.18s; }
 .nav-btn:hover:not(:disabled) { background: var(--blue); color: #fff; border-color: var(--blue); }
 .nav-btn:disabled { opacity: 0.25; cursor: default; }
 .dots { display: flex; gap: 5px; align-items: center; }
@@ -77,415 +39,238 @@ body::before {
 .dot.active { width: 20px; background: var(--blue); }
 .slide-counter { font-size: 11px; color: var(--muted); font-family: 'Courier New', monospace; width: 36px; text-align: center; }
 
-/* ══════════════════════════════
-   HINT
-══════════════════════════════ */
-.hint {
-  position: fixed; top: 20px; right: 20px;
-  font-size: 11px; color: var(--muted); font-family: 'Courier New', monospace;
-  z-index: 200; display: flex; gap: 5px; align-items: center;
-  background: rgba(8,12,23,0.7); padding: 5px 12px; border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.05);
-}
+/* ═══ CORNER BRAND ═══ */
+.corner-brand { position: fixed; top: 16px; left: 20px; z-index: 200; display: flex; align-items: center; gap: 8px; opacity: 0.55; transition: opacity 0.2s; }
+.corner-brand:hover { opacity: 1; }
+.corner-brand img { height: 28px; filter: invert(1); }
+.corner-brand span { font-size: 10px; color: var(--muted); font-family: 'Courier New', monospace; letter-spacing: 1px; text-transform: uppercase; }
+
+/* ═══ HINT ═══ */
+.hint { position: fixed; top: 18px; right: 18px; font-size: 10.5px; color: var(--muted); font-family: 'Courier New', monospace; z-index: 200; display: flex; gap: 5px; align-items: center; background: rgba(8,12,23,0.7); padding: 5px 10px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.05); }
 .hint kbd { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13); padding: 1px 5px; border-radius: 3px; font-family: inherit; }
 
-/* ══════════════════════════════
-   SHARED COMPONENTS
-══════════════════════════════ */
-.slide-inner { width: 100%; max-width: 1060px; display: flex; flex-direction: column; gap: 24px; }
+/* ═══ SHARED ═══ */
+.slide-inner { width: 100%; max-width: 1060px; display: flex; flex-direction: column; gap: 22px; }
 .slide-header { display: flex; align-items: center; gap: 12px; }
-.slide-num {
-  font-family: 'Courier New', monospace; font-size: 11px; color: var(--blue);
-  background: var(--blue-dim); border: 1px solid var(--blue-border);
-  padding: 3px 9px; border-radius: 4px; flex-shrink: 0;
-}
+.slide-num { font-family: 'Courier New', monospace; font-size: 11px; color: var(--blue); background: var(--blue-dim); border: 1px solid var(--blue-border); padding: 3px 9px; border-radius: 4px; flex-shrink: 0; }
 .slide-title { font-size: clamp(20px, 3.2vw, 36px); font-weight: 800; color: #fff; letter-spacing: -0.5px; }
 .slide-title span { color: var(--blue); }
-
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-
-.card {
-  background: var(--card); border: 1px solid var(--blue-border); border-radius: 10px;
-  padding: 16px; display: flex; flex-direction: column; gap: 8px;
-  transition: border-color 0.2s, transform 0.2s;
-}
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card { background: var(--card); border: 1px solid var(--blue-border); border-radius: 10px; padding: 15px; display: flex; flex-direction: column; gap: 7px; transition: border-color 0.2s, transform 0.2s; }
 .card:hover { border-color: var(--blue); transform: translateY(-2px); }
-.card-icon { font-size: 22px; }
-.card h3 { font-size: 14px; font-weight: 700; color: #fff; }
-.card p { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
-
-.bp-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-.bp-table th {
-  background: var(--blue-dim); color: var(--blue);
-  font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 1px;
-  text-transform: uppercase; padding: 8px 13px; text-align: left;
-  border-bottom: 1px solid var(--blue-border);
-}
+.card-icon { font-size: 20px; } .card h3 { font-size: 13.5px; font-weight: 700; color: #fff; } .card p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.bp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.bp-table th { background: var(--blue-dim); color: var(--blue); font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 8px 13px; text-align: left; border-bottom: 1px solid var(--blue-border); }
 .bp-table td { padding: 8px 13px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
 .bp-table tr:last-child td { border-bottom: none; }
 .bp-table tr:hover td { background: rgba(14,165,233,0.04); }
 .bp-name { font-family: 'Courier New', monospace; color: var(--green); font-weight: 600; font-size: 12.5px; }
-.bp-desc { color: var(--muted); font-size: 13px; }
-
+.bp-desc { color: var(--muted); }
 .flow { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; justify-content: center; }
-.flow-step { background: var(--card); border: 1px solid var(--blue-border); border-radius: 7px; padding: 7px 13px; font-size: 12.5px; font-weight: 600; color: var(--text); white-space: nowrap; transition: all 0.2s; }
+.flow-step { background: var(--card); border: 1px solid var(--blue-border); border-radius: 7px; padding: 7px 12px; font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; transition: all 0.2s; }
 .flow-step:hover { border-color: var(--blue); color: var(--blue); }
 .flow-step.hl { border-color: rgba(34,211,238,0.4); color: var(--green); }
 .flow-step.end { border-color: rgba(14,165,233,0.6); color: var(--blue); }
-.flow-arrow { color: var(--blue); opacity: 0.45; font-size: 16px; }
-
-.code {
-  background: #040810; border: 1px solid var(--blue-border); border-radius: 8px;
-  padding: 13px 16px; font-family: 'Courier New', monospace; font-size: 11.5px; line-height: 1.85; color: #cdd9e5;
-}
-.code .k { color: var(--blue); } .code .v { color: var(--green); }
-.code .c { color: var(--muted); } .code .f { color: #d2a8ff; }
-.code .s { color: var(--orange); }
-
-.steps { display: flex; flex-direction: column; gap: 7px; }
-.step { display: flex; align-items: center; gap: 10px; padding: 9px 13px; background: var(--card); border: 1px solid var(--blue-border); border-radius: 8px; }
+.flow-arrow { color: var(--blue); opacity: 0.4; font-size: 15px; }
+.code { background: #040810; border: 1px solid var(--blue-border); border-radius: 8px; padding: 12px 15px; font-family: 'Courier New', monospace; font-size: 11.5px; line-height: 1.85; color: #cdd9e5; }
+.code .k { color: var(--blue); } .code .v { color: var(--green); } .code .c { color: var(--muted); } .code .f { color: #d2a8ff; }
+.steps { display: flex; flex-direction: column; gap: 6px; }
+.step { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--card); border: 1px solid var(--blue-border); border-radius: 8px; }
 .step-n { width: 20px; height: 20px; border-radius: 50%; background: var(--blue); color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.step-text { font-size: 12.5px; color: var(--text); flex: 1; }
-.step-code { font-family: 'Courier New', monospace; font-size: 10.5px; color: var(--green); background: rgba(34,211,238,0.08); padding: 2px 7px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
-
-.prob-grid { display: flex; flex-direction: column; gap: 9px; }
-.prob-card { background: var(--card); border: 1px solid var(--blue-border); border-radius: 10px; padding: 12px 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.prob-s { border-left: 3px solid var(--red); padding-left: 10px; }
-.sol-s  { border-left: 3px solid var(--green); padding-left: 10px; }
-.prob-s h4 { color: var(--red);   font-size: 9.5px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-.sol-s  h4 { color: var(--green); font-size: 9.5px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-.prob-s p, .sol-s p { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
-.sol-s code { font-family: 'Courier New', monospace; color: var(--green); font-size: 11.5px; }
-
-/* Blueprint gallery */
+.step-text { font-size: 12px; color: var(--text); flex: 1; }
+.step-code { font-family: 'Courier New', monospace; font-size: 10px; color: var(--green); background: rgba(34,211,238,0.08); padding: 2px 6px; border-radius: 4px; white-space: nowrap; flex-shrink: 0; }
+.prob-grid { display: flex; flex-direction: column; gap: 8px; }
+.prob-card { background: var(--card); border: 1px solid var(--blue-border); border-radius: 10px; padding: 12px 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.prob-s { border-left: 3px solid var(--red); padding-left: 10px; } .sol-s { border-left: 3px solid var(--green); padding-left: 10px; }
+.prob-s h4 { color: var(--red); font-size: 9.5px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.sol-s h4 { color: var(--green); font-size: 9.5px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+.prob-s p, .sol-s p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.sol-s code { font-family: 'Courier New', monospace; color: var(--green); font-size: 11px; }
 .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
 .gitem { border: 1px solid var(--blue-border); border-radius: 8px; overflow: hidden; background: #030610; transition: border-color 0.2s; cursor: pointer; }
 .gitem:hover { border-color: var(--blue); }
-.gitem img { width: 100%; height: 125px; object-fit: cover; display: block; }
-.glabel { padding: 6px 9px; font-family: 'Courier New', monospace; font-size: 10px; color: var(--muted); border-top: 1px solid var(--blue-border); }
-
-/* ══════════════════════════════
-   SCREENSHOT GALLERY (game)
-══════════════════════════════ */
-.ss-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 10px;
-  width: 100%;
-}
-.ss-item {
-  border: 1px solid var(--blue-border);
-  border-radius: 8px; overflow: hidden;
-  background: #000; cursor: pointer;
-  transition: border-color 0.2s, transform 0.2s;
-  position: relative;
-}
+.gitem img { width: 100%; height: 120px; object-fit: cover; display: block; }
+.glabel { padding: 5px 9px; font-family: 'Courier New', monospace; font-size: 9.5px; color: var(--muted); border-top: 1px solid var(--blue-border); }
+.ss-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); gap: 10px; width: 100%; }
+.ss-item { border: 1px solid var(--blue-border); border-radius: 8px; overflow: hidden; background: #000; cursor: pointer; transition: border-color 0.2s, transform 0.2s; position: relative; }
 .ss-item:hover { border-color: var(--blue); transform: scale(1.02); }
 .ss-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .ss-item.featured { grid-column: span 2; }
-.ss-caption {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 6px 10px;
-  background: linear-gradient(transparent, rgba(0,0,0,0.75));
-  font-size: 10px; color: rgba(255,255,255,0.7);
-  font-family: 'Courier New', monospace;
-  opacity: 0; transition: opacity 0.2s;
-}
+.ss-caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 5px 9px; background: linear-gradient(transparent, rgba(0,0,0,0.78)); font-size: 9.5px; color: rgba(255,255,255,0.7); font-family: 'Courier New', monospace; opacity: 0; transition: opacity 0.2s; }
 .ss-item:hover .ss-caption { opacity: 1; }
-
-/* ══════════════════════════════
-   LIGHTBOX
-══════════════════════════════ */
 .lb { position: fixed; inset: 0; background: rgba(0,0,0,0.94); z-index: 500; display: none; align-items: center; justify-content: center; padding: 30px; }
 .lb.open { display: flex; }
 .lb img { max-width: 95%; max-height: 90vh; border-radius: 6px; border: 1px solid var(--blue-border); }
 .lb-close { position: absolute; top: 16px; right: 20px; color: #fff; font-size: 28px; cursor: pointer; background: none; border: none; opacity: 0.6; transition: opacity 0.2s; }
 .lb-close:hover { opacity: 1; }
 
-/* ══════════════════════════════
-   PORTADA
-══════════════════════════════ */
-.portada { text-align: center; gap: 18px; position: relative; overflow: hidden; }
-
-.portada-bg {
-  position: absolute; inset: 0;
-  background: url('imgs/ss/00011.png') center/cover no-repeat;
-  filter: brightness(0.18) saturate(0.6);
-  z-index: 0;
-  transform: scale(1.05);
-}
+/* ═══ PORTADA ═══ */
+.portada { text-align: center; gap: 14px; position: relative; overflow: hidden; }
+.portada-bg { position: absolute; inset: 0; background: url('imgs/ss/00011.png') center/cover no-repeat; filter: brightness(0.16) saturate(0.5); z-index: 0; transform: scale(1.05); }
 .portada > * { position: relative; z-index: 1; }
-
-.portada-tag {
-  display: inline-flex; align-items: center; gap: 7px;
-  background: var(--blue-dim); border: 1px solid var(--blue-border);
-  color: var(--blue); padding: 4px 14px; border-radius: 40px;
-  font-size: 11px; font-family: 'Courier New', monospace;
-  letter-spacing: 1.5px; text-transform: uppercase;
-}
-.blink-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--blue); animation: blink 1.4s ease-in-out infinite; }
-.portada h1 {
-  font-size: clamp(52px, 10vw, 108px); font-weight: 900; letter-spacing: -3px;
-  background: linear-gradient(135deg, #fff 20%, var(--blue) 65%, #38bdf8 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  line-height: 0.9;
-}
-.portada-sub { font-size: clamp(14px, 2vw, 22px); color: rgba(255,255,255,0.45); font-weight: 300; letter-spacing: 3px; }
+.portada-top { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.portada-ucv { height: 32px; opacity: 0.7; }
+.portada-ucvlabel { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; font-family: 'Courier New', monospace; border-left: 1px solid rgba(255,255,255,0.15); padding-left: 12px; }
+.blink-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--blue); display: inline-block; animation: blink 1.4s ease-in-out infinite; }
+.portada-tag { display: inline-flex; align-items: center; gap: 7px; background: var(--blue-dim); border: 1px solid var(--blue-border); color: var(--blue); padding: 4px 14px; border-radius: 40px; font-size: 11px; font-family: 'Courier New', monospace; letter-spacing: 1.5px; text-transform: uppercase; }
+.portada h1 { font-size: clamp(50px, 10vw, 104px); font-weight: 900; letter-spacing: -3px; background: linear-gradient(135deg, #fff 20%, var(--blue) 65%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 0.9; }
+.portada-sub { font-size: clamp(12px, 1.8vw, 20px); color: rgba(255,255,255,0.38); font-weight: 300; letter-spacing: 4px; }
+.studio-brand { display: flex; align-items: center; gap: 12px; justify-content: center; }
+.studio-brand img { height: 36px; filter: invert(1); opacity: 0.85; }
+.studio-brand-text { text-align: left; }
+.studio-brand-text .name { font-size: 14px; font-weight: 800; color: #fff; letter-spacing: 1px; }
+.studio-brand-text .sub { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
 .portada-chips { display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; }
-.chip { padding: 7px 18px; border: 1px solid var(--blue-border); border-radius: 7px; background: var(--blue-dim); }
+.chip { padding: 6px 16px; border: 1px solid var(--blue-border); border-radius: 7px; background: var(--blue-dim); display: flex; align-items: center; gap: 7px; }
 .chip .cl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 1px; }
-.chip .cv { color: var(--blue); font-weight: 700; font-size: 13px; }
-.trailer-btn {
-  display: inline-flex; align-items: center; gap: 9px;
-  background: var(--blue); color: #fff;
-  border: none; border-radius: 10px;
-  padding: 12px 28px; font-size: 15px; font-weight: 700;
-  cursor: pointer; transition: all 0.2s;
-  font-family: inherit; letter-spacing: 0.5px;
-  box-shadow: 0 0 32px rgba(14,165,233,0.35);
-}
-.trailer-btn:hover { background: #0284c7; transform: scale(1.04); box-shadow: 0 0 48px rgba(14,165,233,0.5); }
-.trailer-btn svg { width: 18px; height: 18px; }
+.chip .cv { color: var(--blue); font-weight: 700; font-size: 12.5px; }
+.chip img.chip-logo { height: 14px; opacity: 0.8; filter: invert(1); }
+.trailer-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--blue); color: #fff; border: none; border-radius: 10px; padding: 11px 26px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: inherit; letter-spacing: 0.5px; box-shadow: 0 0 28px rgba(14,165,233,0.4); }
+.trailer-btn:hover { background: #0284c7; transform: scale(1.04); box-shadow: 0 0 44px rgba(14,165,233,0.55); }
 
-/* ══════════════════════════════
-   FIN
-══════════════════════════════ */
-.fin { text-align: center; gap: 16px; position: relative; overflow: hidden; }
-.fin-bg { position: absolute; inset: 0; background: url('imgs/ss/00004.png') center/cover no-repeat; filter: brightness(0.15) saturate(0.5); z-index: 0; }
+/* ═══ FIN ═══ */
+.fin { text-align: center; gap: 14px; position: relative; overflow: hidden; }
+.fin-bg { position: absolute; inset: 0; background: url('imgs/ss/00004.png') center/cover no-repeat; filter: brightness(0.13) saturate(0.4); z-index: 0; }
 .fin > * { position: relative; z-index: 1; }
-.fin h2 {
-  font-size: clamp(36px, 6vw, 72px); font-weight: 900;
-  background: linear-gradient(135deg, #fff 0%, var(--blue) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-}
-.fin p { font-size: 16px; color: rgba(255,255,255,0.45); }
-.fin-stats { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
-.stat { padding: 12px 22px; border: 1px solid var(--blue-border); border-radius: 10px; background: rgba(14,165,233,0.08); text-align: center; min-width: 120px; }
-.stat .sv { font-size: 26px; font-weight: 900; line-height: 1; }
-.stat .sl { font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+.fin-logo { height: 72px; margin-bottom: 4px; }
+.fin h2 { font-size: clamp(32px, 5.5vw, 64px); font-weight: 900; background: linear-gradient(135deg, #fff 0%, var(--blue) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.fin-name { font-size: 13px; color: rgba(255,255,255,0.35); letter-spacing: 3px; text-transform: uppercase; }
+.fin-stats { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.stat { padding: 10px 20px; border: 1px solid var(--blue-border); border-radius: 10px; background: rgba(14,165,233,0.07); text-align: center; min-width: 110px; }
+.stat .sv { font-size: 24px; font-weight: 900; line-height: 1; }
+.stat .sl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+.fin-logos { display: flex; align-items: center; gap: 20px; justify-content: center; opacity: 0.4; filter: invert(1); }
+.fin-logos img { height: 22px; }
 
-/* ══════════════════════════════
-   ANIMATIONS
-══════════════════════════════ */
-@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
-@keyframes kenburns { 0% { transform: scale(1.0); } 100% { transform: scale(1.12); } }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes scaleIn { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
-@keyframes progressBar { from { width: 0%; } to { width: 100%; } }
-
-.float { animation: float 3.5s ease-in-out infinite; display: inline-block; }
-
-/* ══════════════════════════════
-   TRAILER OVERLAY
-══════════════════════════════ */
-#trailer {
-  position: fixed; inset: 0; z-index: 900;
-  background: #000;
-  display: none; flex-direction: column;
-  align-items: center; justify-content: center;
-  overflow: hidden;
-}
+/* ═══ TRAILER ═══ */
+#trailer { position: fixed; inset: 0; z-index: 900; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
 #trailer.open { display: flex; }
-
-/* Cinematic bars */
-#trailer::before, #trailer::after {
-  content: ''; position: absolute; left: 0; right: 0;
-  height: 80px; background: #000; z-index: 10;
-  transition: height 0.6s cubic-bezier(0.4,0,0.2,1);
-}
+#trailer::before, #trailer::after { content: ''; position: absolute; left: 0; right: 0; height: 76px; background: #000; z-index: 10; }
 #trailer::before { top: 0; }
 #trailer::after  { bottom: 0; }
-#trailer.wide-bars::before, #trailer.wide-bars::after { height: 80px; }
-
-.t-scene {
-  position: absolute; inset: 0;
-  opacity: 0; transition: opacity 0.8s ease;
-}
+.t-scene { position: absolute; inset: 0; opacity: 0; transition: opacity 0.9s ease; }
 .t-scene.active { opacity: 1; }
 .t-scene.title-card { background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-
-.t-img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  animation: kenburns 5s ease-out forwards;
-}
-
-.t-overlay {
-  position: absolute; inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(0,0,0,0.72) 0%,
-    rgba(0,0,0,0.15) 40%,
-    rgba(0,0,0,0.05) 70%,
-    rgba(0,0,0,0.4) 100%
-  );
-  z-index: 2;
-}
-
-.t-text {
-  position: absolute; bottom: 110px; left: 0; right: 0;
-  text-align: center; z-index: 3; padding: 0 60px;
-  animation: fadeUp 0.7s ease-out forwards;
-}
-.t-title {
-  font-size: clamp(24px, 5vw, 60px); font-weight: 900;
-  color: #fff; letter-spacing: 4px; text-transform: uppercase;
-  text-shadow: 0 2px 20px rgba(0,0,0,0.8);
-  font-family: 'Segoe UI', system-ui, sans-serif;
-}
-.t-sub {
-  font-size: clamp(12px, 1.8vw, 18px); color: rgba(255,255,255,0.6);
-  letter-spacing: 2px; margin-top: 8px;
-  font-family: 'Courier New', monospace;
-}
-
-/* Title card scene */
-.t-tc-title {
-  font-size: clamp(48px, 9vw, 110px); font-weight: 900; letter-spacing: -3px;
-  background: linear-gradient(135deg, #fff 20%, var(--blue) 70%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  animation: scaleIn 1s ease-out forwards;
-  text-align: center;
-}
-.t-tc-sub {
-  font-size: clamp(14px, 2vw, 22px); color: rgba(255,255,255,0.45);
-  letter-spacing: 4px; margin-top: 12px; text-align: center;
-  animation: fadeIn 1.2s ease-out 0.5s both;
-}
-.t-tc-engine {
-  margin-top: 24px;
-  display: flex; gap: 12px; justify-content: center;
-  animation: fadeIn 1s ease-out 1s both;
-}
-.t-tc-chip {
-  padding: 6px 16px; border: 1px solid var(--blue-border);
-  border-radius: 6px; background: var(--blue-dim);
-  font-size: 13px; color: var(--blue); font-weight: 600;
-}
-
+.t-img { width: 100%; height: 100%; object-fit: cover; animation: kenburns 5.5s ease-out forwards; }
+.t-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 45%, rgba(0,0,0,0.0) 70%, rgba(0,0,0,0.45) 100%); z-index: 2; }
+.t-text { position: absolute; bottom: 106px; left: 0; right: 0; text-align: center; z-index: 3; padding: 0 60px; animation: fadeUp 0.7s ease-out forwards; }
+.t-title { font-size: clamp(22px, 5vw, 58px); font-weight: 900; color: #fff; letter-spacing: 5px; text-transform: uppercase; text-shadow: 0 2px 24px rgba(0,0,0,0.9); }
+.t-sub { font-size: clamp(11px, 1.6vw, 16px); color: rgba(255,255,255,0.55); letter-spacing: 2px; margin-top: 7px; font-family: 'Courier New', monospace; }
+/* Title card */
+.t-tc-logo { height: 80px; margin-bottom: 16px; animation: scaleIn 1s ease-out forwards; }
+.t-tc-title { font-size: clamp(44px, 8.5vw, 100px); font-weight: 900; letter-spacing: -3px; background: linear-gradient(135deg, #fff 20%, var(--blue) 70%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: scaleIn 1s ease-out 0.1s both; text-align: center; }
+.t-tc-sub { font-size: clamp(12px, 1.8vw, 20px); color: rgba(255,255,255,0.4); letter-spacing: 4px; margin-top: 10px; text-align: center; animation: fadeIn 1.2s ease-out 0.6s both; }
+.t-tc-chips { margin-top: 20px; display: flex; gap: 10px; justify-content: center; animation: fadeIn 1s ease-out 1s both; }
+.t-tc-chip { padding: 5px 14px; border: 1px solid var(--blue-border); border-radius: 6px; background: var(--blue-dim); font-size: 12px; color: var(--blue); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.t-tc-chip img { height: 12px; filter: invert(0.5) sepia(1) hue-rotate(170deg) saturate(5); }
+.t-tc-studio { margin-top: 24px; display: flex; align-items: center; gap: 10px; justify-content: center; animation: fadeIn 0.8s ease-out 1.5s both; opacity: 0.5; }
+.t-tc-studio img { height: 20px; filter: invert(1); }
+.t-tc-studio span { font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
 /* Progress bar */
-.t-progress {
-  position: absolute; bottom: 80px; left: 0; right: 0;
-  height: 2px; background: rgba(255,255,255,0.1); z-index: 10;
-}
-.t-progress-fill {
-  height: 100%; background: var(--blue);
-  animation: none;
-}
-
+.t-progress { position: absolute; bottom: 76px; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.08); z-index: 10; }
+.t-progress-fill { height: 100%; background: var(--blue); transition: none; }
+/* Dots */
+.t-dots { position: absolute; bottom: 86px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; z-index: 11; }
+.t-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.22); transition: all 0.3s; }
+.t-dot.active { background: var(--blue); width: 12px; border-radius: 2px; }
 /* Controls */
-.t-skip {
-  position: absolute; top: 95px; right: 24px; z-index: 11;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  color: rgba(255,255,255,0.6); padding: 6px 16px;
-  border-radius: 6px; font-size: 12px; cursor: pointer;
-  font-family: 'Courier New', monospace; letter-spacing: 1px;
-  transition: all 0.2s;
-}
-.t-skip:hover { background: rgba(255,255,255,0.14); color: #fff; }
-
-.t-close {
-  position: absolute; top: 90px; left: 20px; z-index: 11;
-  background: none; border: none; color: rgba(255,255,255,0.3);
-  font-size: 22px; cursor: pointer; transition: color 0.2s;
-  display: none;
-}
+.t-watermark { position: absolute; top: 86px; left: 50%; transform: translateX(-50%); z-index: 11; font-family: 'Courier New', monospace; font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
+.t-skip { position: absolute; top: 88px; right: 22px; z-index: 11; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13); color: rgba(255,255,255,0.5); padding: 5px 14px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: 'Courier New', monospace; letter-spacing: 1px; transition: all 0.2s; }
+.t-skip:hover { background: rgba(255,255,255,0.13); color: #fff; }
+.t-close { position: absolute; top: 84px; left: 20px; z-index: 11; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.13); color: rgba(255,255,255,0.5); padding: 5px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; font-family: 'Courier New', monospace; letter-spacing: 1px; transition: all 0.2s; display: none; }
 .t-close.show { display: block; }
-.t-close:hover { color: #fff; }
+.t-close:hover { color: #fff; background: rgba(255,255,255,0.13); }
+/* Music indicator */
+.t-music { position: absolute; top: 88px; left: 22px; z-index: 11; display: flex; align-items: center; gap: 6px; font-size: 10px; color: rgba(255,255,255,0.3); font-family: 'Courier New', monospace; }
+.t-music-bars { display: flex; gap: 2px; align-items: flex-end; height: 12px; }
+.t-music-bar { width: 2px; background: var(--blue); border-radius: 1px; animation: musicBar 0.8s ease-in-out infinite alternate; }
+.t-music-bar:nth-child(1) { height: 4px; animation-delay: 0s; }
+.t-music-bar:nth-child(2) { height: 8px; animation-delay: 0.15s; }
+.t-music-bar:nth-child(3) { height: 12px; animation-delay: 0.05s; }
+.t-music-bar:nth-child(4) { height: 6px; animation-delay: 0.2s; }
+.t-music-bar:nth-child(5) { height: 10px; animation-delay: 0.1s; }
 
-/* Scene counter dots */
-.t-dots {
-  position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%);
-  display: flex; gap: 5px; z-index: 11;
-}
-.t-dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.25); transition: all 0.3s; }
-.t-dot.active { background: var(--blue); width: 14px; border-radius: 2px; }
-
-/* UE5 watermark on trailer */
-.t-watermark {
-  position: absolute; top: 90px; left: 50%; transform: translateX(-50%);
-  z-index: 11; font-family: 'Courier New', monospace;
-  font-size: 11px; color: rgba(255,255,255,0.25); letter-spacing: 2px; text-transform: uppercase;
-}
+/* ═══ KEYFRAMES ═══ */
+@keyframes float   { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes blink   { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+@keyframes kenburns { 0% { transform: scale(1.0) translateX(0) translateY(0); } 100% { transform: scale(1.13) translateX(-1%) translateY(-1%); } }
+@keyframes fadeUp  { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1); } }
+@keyframes musicBar { from { transform: scaleY(0.3); } to { transform: scaleY(1); } }
+.float { animation: float 3.5s ease-in-out infinite; display: inline-block; }
 </style>
 </head>
 <body>
 
-<div class="hint"><kbd>←</kbd> <kbd>→</kbd> para navegar · <kbd>Esc</kbd> cerrar</div>
+<!-- Corner brand -->
+<div class="corner-brand">
+  <img src="LogoDorado.png" alt="NH">
+  <span>Nacho &amp; Hugo VR</span>
+</div>
+
+<div class="hint"><kbd>←</kbd><kbd>→</kbd> navegar &nbsp;·&nbsp; <kbd>Esc</kbd> cerrar</div>
 
 <div class="presentation">
 
-  <!-- ══ SLIDE 1 · PORTADA ══ -->
+  <!-- ══ 1 · PORTADA ══ -->
   <div class="slide active portada" data-index="0">
     <div class="portada-bg"></div>
+    <div class="portada-top">
+      <img src="UCV.png" class="portada-ucv" alt="UCV">
+      <span class="portada-ucvlabel">Universidad Católica de Valencia</span>
+    </div>
     <div class="portada-tag"><span class="blink-dot"></span>Asignatura de Realidad Virtual</div>
     <h1>CAJERO 231</h1>
     <p class="portada-sub">SIMULADOR DE CAJA EN REALIDAD VIRTUAL</p>
+    <div class="studio-brand">
+      <img src="LogoDorado.png" alt="NH" style="height:38px;">
+      <div class="studio-brand-text">
+        <div class="name">Nacho &amp; Hugo</div>
+        <div class="sub">VR Experiences</div>
+      </div>
+    </div>
     <div class="portada-chips">
-      <div class="chip"><span class="cl">Motor</span><span class="cv">Unreal Engine 5</span></div>
-      <div class="chip"><span class="cl">Scripting</span><span class="cv">Blueprints</span></div>
-      <div class="chip"><span class="cl">Género</span><span class="cv">Simulación VR</span></div>
+      <div class="chip">
+        <img src="Unreal.svg" class="chip-logo" alt="UE5">
+        <div><span class="cl">Motor</span><span class="cv">Unreal Engine 5</span></div>
+      </div>
+      <div class="chip"><div><span class="cl">Scripting</span><span class="cv">Blueprints</span></div></div>
+      <div class="chip"><div><span class="cl">Género</span><span class="cv">Simulación VR</span></div></div>
     </div>
     <button class="trailer-btn" onclick="openTrailer()">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M8 5v14l11-7z"/></svg>
       Ver Tráiler
     </button>
   </div>
 
-  <!-- ══ SLIDE 2 · CONCEPTO ══ -->
+  <!-- ══ 2 · CONCEPTO ══ -->
   <div class="slide" data-index="1">
     <div class="slide-inner">
-      <div class="slide-header">
-        <span class="slide-num">02</span>
-        <h2 class="slide-title">¿De qué va el <span>juego</span>?</h2>
-      </div>
+      <div class="slide-header"><span class="slide-num">02</span><h2 class="slide-title">¿De qué va el <span>juego</span>?</h2></div>
       <div class="two-col" style="align-items:start;">
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="card">
-            <div class="card-icon">🧑‍💼</div>
-            <h3>Tú eres el cajero</h3>
-            <p>El jugador está detrás de la caja de un supermercado en VR. Los clientes NPC llegan solos y esperan su turno.</p>
-          </div>
-          <div class="card">
-            <div class="card-icon">📦</div>
-            <h3>Escanea los productos</h3>
-            <p>Cada cliente trae entre 1 y 6 productos aleatorios. Tienes que pasar cada uno físicamente por el escáner.</p>
-          </div>
-          <div class="card">
-            <div class="card-icon">🛍️</div>
-            <h3>Entrega la bolsa</h3>
-            <p>Al acabar, los productos desaparecen y aparece una bolsa. La llevas a la zona de entrega para liberar al cliente.</p>
-          </div>
-          <div class="card">
-            <div class="card-icon">🔁</div>
-            <h3>Flujo infinito</h3>
-            <p>En cuanto un cliente sale, el sistema spawnea otro 2 segundos después. La caja nunca para.</p>
-          </div>
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <div class="card"><div class="card-icon">🧑‍💼</div><h3>Tú eres el cajero</h3><p>El jugador está detrás de la caja de un supermercado en VR. Los clientes NPC llegan solos y esperan su turno.</p></div>
+          <div class="card"><div class="card-icon">📦</div><h3>Escanea los productos</h3><p>Cada cliente trae entre 1 y 6 productos aleatorios. Tienes que pasar cada uno físicamente por el escáner.</p></div>
+          <div class="card"><div class="card-icon">🛍️</div><h3>Entrega la bolsa</h3><p>Al acabar, los productos desaparecen y aparece una bolsa. La llevas a la zona de entrega para liberar al cliente.</p></div>
+          <div class="card"><div class="card-icon">🔁</div><h3>Flujo infinito</h3><p>En cuanto un cliente sale, el sistema spawnea otro 2 segundos después. La caja nunca para.</p></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div style="border-radius:10px;overflow:hidden;border:1px solid var(--blue-border);flex:1;cursor:pointer;" onclick="openLB('imgs/ss/00004.png')">
-            <img src="imgs/ss/00004.png" style="width:100%;display:block;height:220px;object-fit:cover;">
+          <div style="border-radius:10px;overflow:hidden;border:1px solid var(--blue-border);cursor:pointer;" onclick="openLB('imgs/ss/00004.png')">
+            <img src="imgs/ss/00004.png" style="width:100%;display:block;height:215px;object-fit:cover;">
           </div>
           <div style="border-radius:10px;overflow:hidden;border:1px solid var(--blue-border);cursor:pointer;" onclick="openLB('imgs/ss/00008.png')">
-            <img src="imgs/ss/00008.png" style="width:100%;display:block;height:160px;object-fit:cover;object-position:center 20%;">
+            <img src="imgs/ss/00008.png" style="width:100%;display:block;height:155px;object-fit:cover;object-position:center 20%;">
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ══ SLIDE 3 · ARQUITECTURA ══ -->
+  <!-- ══ 3 · ARQUITECTURA ══ -->
   <div class="slide" data-index="2">
     <div class="slide-inner">
-      <div class="slide-header">
-        <span class="slide-num">03</span>
-        <h2 class="slide-title">Arquitectura de <span>Blueprints</span></h2>
-      </div>
+      <div class="slide-header"><span class="slide-num">03</span><h2 class="slide-title">Arquitectura de <span>Blueprints</span></h2></div>
       <table class="bp-table">
         <thead><tr><th>Blueprint</th><th>Responsabilidad</th></tr></thead>
         <tbody>
@@ -502,14 +287,11 @@ body::before {
     </div>
   </div>
 
-  <!-- ══ SLIDE 4 · FLUJO ══ -->
+  <!-- ══ 4 · FLUJO ══ -->
   <div class="slide" data-index="3">
     <div class="slide-inner">
-      <div class="slide-header">
-        <span class="slide-num">04</span>
-        <h2 class="slide-title">Flujo del <span>Cliente</span></h2>
-      </div>
-      <div class="flow" style="margin-bottom:6px;">
+      <div class="slide-header"><span class="slide-num">04</span><h2 class="slide-title">Flujo del <span>Cliente</span></h2></div>
+      <div class="flow" style="margin-bottom:4px;">
         <div class="flow-step">🧑 Spawn</div><div class="flow-arrow">→</div>
         <div class="flow-step">🚶 Espera</div><div class="flow-arrow">→</div>
         <div class="flow-step">📋 Pedido</div><div class="flow-arrow">→</div>
@@ -520,17 +302,14 @@ body::before {
         <div class="flow-step end">🔄 Nuevo</div>
       </div>
       <div class="two-col">
-        <div class="code">
-<span class="c">// GestorClientes — ClienteTerminado()</span>
+        <div class="code"><span class="c">// GestorClientes — ClienteTerminado()</span>
 <span class="k">PedidoYaGenerado</span> = <span class="v">false</span>
 <span class="f">Delay</span>(<span class="v">2.0s</span>)
 <span class="f">SpawnearCliente</span>()
   → <span class="f">SpawnActor</span>(BP_Cliente, SpawnPoint)
   → SET GestorRef · DondeEsperar · DondeIrse
-  → <span class="f">IniciarCliente</span>()
-        </div>
-        <div class="code">
-<span class="c">// Cliente — PedidoEntregado()</span>
+  → <span class="f">IniciarCliente</span>()</div>
+        <div class="code"><span class="c">// Cliente — PedidoEntregado()</span>
 <span class="f">AI_MoveTo</span>(<span class="k">DondeIrse</span>)
   → <span class="f">IsValid</span>(GestorRef)?
     → <span class="f">ClienteTerminado</span>()
@@ -538,28 +317,24 @@ body::before {
 
 <span class="c">// Cliente — IniciarCliente()</span>
 <span class="f">AI_MoveTo</span>(<span class="k">DondeEsperar</span>)
-  → llega a BP_ZonaClienteEspera
-  → <span class="f">GenerarCompra</span>()
-        </div>
+  → BP_ZonaClienteEspera
+  → <span class="f">GenerarCompra</span>()</div>
       </div>
     </div>
   </div>
 
-  <!-- ══ SLIDE 5 · EL MUNDO ══ -->
+  <!-- ══ 5 · EL SUPERMERCADO ══ -->
   <div class="slide" data-index="4">
     <div class="slide-inner">
-      <div class="slide-header">
-        <span class="slide-num">05</span>
-        <h2 class="slide-title">El <span>Supermercado</span></h2>
-      </div>
-      <div class="ss-grid" style="height:380px;">
+      <div class="slide-header"><span class="slide-num">05</span><h2 class="slide-title">El <span>Supermercado</span></h2></div>
+      <div class="ss-grid" style="height:375px;">
         <div class="ss-item featured" onclick="openLB('imgs/ss/00011.png')">
           <img src="imgs/ss/00011.png" alt="Vista general" style="height:100%;">
-          <div class="ss-caption">Vista general del supermercado</div>
+          <div class="ss-caption">Vista general — overview del supermercado</div>
         </div>
         <div class="ss-item" onclick="openLB('imgs/ss/00003.png')">
           <img src="imgs/ss/00003.png" alt="Exterior">
-          <div class="ss-caption">Fachada exterior</div>
+          <div class="ss-caption">Fachada exterior — letrero "supermarket"</div>
         </div>
         <div class="ss-item" onclick="openLB('imgs/ss/00001.png')">
           <img src="imgs/ss/00001.png" alt="Caja" style="object-position:center 30%;">
@@ -571,19 +346,16 @@ body::before {
         </div>
         <div class="ss-item" onclick="openLB('imgs/ss/00000.png')">
           <img src="imgs/ss/00000.png" alt="Cliente caminando">
-          <div class="ss-caption">Cliente dirigiéndose a la caja</div>
+          <div class="ss-caption">Cliente NPC dirigiéndose a la caja</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ══ SLIDE 6 · CAJA ══ -->
+  <!-- ══ 6 · CAJA ══ -->
   <div class="slide" data-index="5">
     <div class="slide-inner">
-      <div class="slide-header">
-        <span class="slide-num">06</span>
-        <h2 class="slide-title">Sistema de <span>Caja</span> — Generar Compra</h2>
-      </div>
+      <div class="slide-header"><span class="slide-num">06</span><h2 class="slide-title">Sistema de <span>Caja</span> — Generar Compra</h2></div>
       <div class="two-col">
         <div class="steps">
           <div class="step"><div class="step-n">1</div><div class="step-text">Limpiar estado del cliente anterior</div><div class="step-code">Escaneados = 0</div></div>
@@ -594,30 +366,25 @@ body::before {
           <div class="step"><div class="step-n">6</div><div class="step-text">Destruir productos y spawnear bolsa</div><div class="step-code">CompletarCompra()</div></div>
         </div>
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div class="code">
-<span class="c">// GenerarCompra()</span>
+          <div class="code"><span class="c">// GenerarCompra()</span>
 <span class="k">ProductosTotales</span> = <span class="f">Random</span>(<span class="v">1</span>,<span class="v">6</span>)
 <span class="f">ForLoop</span>(<span class="v">0</span>→n): <span class="f">SpawnActor</span>(BP_Producto)
 
 <span class="c">// CompletarCompra()</span>
 <span class="f">ForEach</span>(<span class="k">ProductosGenerados</span>): <span class="f">Destroy</span>()
-<span class="f">SpawnActor</span>(BP_BolsaCompra, SpawnBolsa)
-          </div>
+<span class="f">SpawnActor</span>(BP_BolsaCompra, SpawnBolsa)</div>
           <div style="border-radius:8px;overflow:hidden;border:1px solid var(--blue-border);cursor:pointer;" onclick="openLB('imgs/ss/00009.png')">
-            <img src="imgs/ss/00009.png" style="width:100%;height:130px;object-fit:cover;display:block;" alt="Productos en estantería">
+            <img src="imgs/ss/00009.png" style="width:100%;height:130px;object-fit:cover;display:block;">
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ══ SLIDE 7 · ESCANER ══ -->
+  <!-- ══ 7 · ESCÁNER ══ -->
   <div class="slide" data-index="6">
     <div class="slide-inner">
-      <div class="slide-header">
-        <span class="slide-num">07</span>
-        <h2 class="slide-title">Sistema de <span>Escaneado</span></h2>
-      </div>
+      <div class="slide-header"><span class="slide-num">07</span><h2 class="slide-title">Sistema de <span>Escaneado</span></h2></div>
       <div class="two-col">
         <div class="steps">
           <div class="step"><div class="step-n">1</div><div class="step-text">Objeto entra en el volumen del escáner</div></div>
@@ -629,123 +396,80 @@ body::before {
         </div>
         <div style="display:flex;flex-direction:column;gap:10px;">
           <div style="border-radius:8px;overflow:hidden;border:1px solid var(--blue-border);cursor:pointer;" onclick="openLB('imgs/ss/00005.png')">
-            <img src="imgs/ss/00005.png" style="width:100%;height:160px;object-fit:cover;display:block;">
+            <img src="imgs/ss/00005.png" style="width:100%;height:155px;object-fit:cover;display:block;">
           </div>
           <div style="border-radius:8px;overflow:hidden;border:1px solid var(--blue-border);cursor:pointer;" onclick="openLB('imgs/ss/00006.png')">
-            <img src="imgs/ss/00006.png" style="width:100%;height:120px;object-fit:cover;display:block;">
+            <img src="imgs/ss/00006.png" style="width:100%;height:115px;object-fit:cover;display:block;">
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ══ SLIDE 8 · BLUEPRINTS 1 ══ -->
+  <!-- ══ 8 · BLUEPRINTS 1 ══ -->
   <div class="slide" data-index="7">
     <div class="slide-inner">
-      <div class="slide-header">
-        <span class="slide-num">08</span>
-        <h2 class="slide-title">Blueprints en <span>Acción</span></h2>
-      </div>
+      <div class="slide-header"><span class="slide-num">08</span><h2 class="slide-title">Blueprints en <span>Acción</span></h2></div>
       <div class="gallery">
-        <div class="gitem" onclick="openLB('imgs/BP_GestorClientes.png')">
-          <img src="imgs/BP_GestorClientes.png" alt="BP_GestorClientes">
-          <div class="glabel">BP_GestorClientes — Spawn y ciclo de clientes</div>
-        </div>
-        <div class="gitem" onclick="openLB('imgs/BP_Cliente.png')">
-          <img src="imgs/BP_Cliente.png" alt="BP_Cliente">
-          <div class="glabel">BP_Cliente — AI MoveTo · IniciarCliente / PedidoEntregado</div>
-        </div>
-        <div class="gitem" onclick="openLB('imgs/Funcion_SpawnearCliente_BP_GestorClientes.png')">
-          <img src="imgs/Funcion_SpawnearCliente_BP_GestorClientes.png" alt="SpawnearCliente">
-          <div class="glabel">SpawnearCliente() — Instanciar y configurar cliente</div>
-        </div>
-        <div class="gitem" onclick="openLB('imgs/Funcion_RegistrarProductoEscaneado_BP_SistemaCaja.png')">
-          <img src="imgs/Funcion_RegistrarProductoEscaneado_BP_SistemaCaja.png" alt="RegistrarProducto">
-          <div class="glabel">RegistrarProductoEscaneado() — Conteo y CompletarCompra</div>
-        </div>
+        <div class="gitem" onclick="openLB('imgs/BP_GestorClientes.png')"><img src="imgs/BP_GestorClientes.png"><div class="glabel">BP_GestorClientes — Spawn y ciclo de clientes</div></div>
+        <div class="gitem" onclick="openLB('imgs/BP_Cliente.png')"><img src="imgs/BP_Cliente.png"><div class="glabel">BP_Cliente — AI MoveTo · IniciarCliente / PedidoEntregado</div></div>
+        <div class="gitem" onclick="openLB('imgs/Funcion_SpawnearCliente_BP_GestorClientes.png')"><img src="imgs/Funcion_SpawnearCliente_BP_GestorClientes.png"><div class="glabel">SpawnearCliente() — Instanciar y configurar cliente</div></div>
+        <div class="gitem" onclick="openLB('imgs/Funcion_RegistrarProductoEscaneado_BP_SistemaCaja.png')"><img src="imgs/Funcion_RegistrarProductoEscaneado_BP_SistemaCaja.png"><div class="glabel">RegistrarProductoEscaneado() — Conteo y CompletarCompra</div></div>
       </div>
     </div>
   </div>
 
-  <!-- ══ SLIDE 9 · BLUEPRINTS 2 ══ -->
+  <!-- ══ 9 · BLUEPRINTS 2 ══ -->
   <div class="slide" data-index="8">
     <div class="slide-inner">
-      <div class="slide-header">
-        <span class="slide-num">09</span>
-        <h2 class="slide-title">Más <span>Blueprints</span></h2>
-      </div>
+      <div class="slide-header"><span class="slide-num">09</span><h2 class="slide-title">Más <span>Blueprints</span></h2></div>
       <div class="gallery">
-        <div class="gitem" onclick="openLB('imgs/Funcion_GenerarCompra_BP_SistemaCaja.png')">
-          <img src="imgs/Funcion_GenerarCompra_BP_SistemaCaja.png" alt="GenerarCompra">
-          <div class="glabel">GenerarCompra() — Random, ForLoop y spawn de productos</div>
-        </div>
-        <div class="gitem" onclick="openLB('imgs/Funcion_ClompetarCompra_BP_SistemaCaja.png')">
-          <img src="imgs/Funcion_ClompetarCompra_BP_SistemaCaja.png" alt="CompletarCompra">
-          <div class="glabel">CompletarCompra() — Destruir productos y spawnear bolsa</div>
-        </div>
-        <div class="gitem" onclick="openLB('imgs/BP_ZonaClienteEspera.png')">
-          <img src="imgs/BP_ZonaClienteEspera.png" alt="ZonaClienteEspera">
-          <div class="glabel">BP_ZonaClienteEspera — Trigger de inicio (PedidoYaGenerado)</div>
-        </div>
-        <div class="gitem" onclick="openLB('imgs/BP_BolsaCompra.png')">
-          <img src="imgs/BP_BolsaCompra.png" alt="BolsaCompra">
-          <div class="glabel">BP_BolsaCompra — Verificación y PedidoEntregado()</div>
-        </div>
+        <div class="gitem" onclick="openLB('imgs/Funcion_GenerarCompra_BP_SistemaCaja.png')"><img src="imgs/Funcion_GenerarCompra_BP_SistemaCaja.png"><div class="glabel">GenerarCompra() — Random, ForLoop y spawn de productos</div></div>
+        <div class="gitem" onclick="openLB('imgs/Funcion_ClompetarCompra_BP_SistemaCaja.png')"><img src="imgs/Funcion_ClompetarCompra_BP_SistemaCaja.png"><div class="glabel">CompletarCompra() — Destruir productos y spawnear bolsa</div></div>
+        <div class="gitem" onclick="openLB('imgs/BP_ZonaClienteEspera.png')"><img src="imgs/BP_ZonaClienteEspera.png"><div class="glabel">BP_ZonaClienteEspera — Trigger de inicio (PedidoYaGenerado)</div></div>
+        <div class="gitem" onclick="openLB('imgs/BP_BolsaCompra.png')"><img src="imgs/BP_BolsaCompra.png"><div class="glabel">BP_BolsaCompra — Verificación y PedidoEntregado()</div></div>
       </div>
     </div>
   </div>
 
-  <!-- ══ SLIDE 10 · PROBLEMAS ══ -->
+  <!-- ══ 10 · PROBLEMAS ══ -->
   <div class="slide" data-index="9">
     <div class="slide-inner">
-      <div class="slide-header">
-        <span class="slide-num">10</span>
-        <h2 class="slide-title">Problemas y <span>Soluciones</span></h2>
-      </div>
+      <div class="slide-header"><span class="slide-num">10</span><h2 class="slide-title">Problemas y <span>Soluciones</span></h2></div>
       <div class="prob-grid">
-        <div class="prob-card">
-          <div class="prob-s"><h4>🐛 Problema</h4><p>Un mismo cliente generaba varios pedidos al entrar varias veces en la zona de espera</p></div>
-          <div class="sol-s"><h4>✅ Solución</h4><p>Flag booleano <code>PedidoYaGenerado</code> — solo lanza GenerarCompra() si es <code>false</code></p></div>
-        </div>
-        <div class="prob-card">
-          <div class="prob-s"><h4>🐛 Problema</h4><p>Un producto se sumaba al total varias veces si entraba y salía del volumen del escáner</p></div>
-          <div class="sol-s"><h4>✅ Solución</h4><p>Flag por producto: <code>YaEscaneado</code> — bloquea cualquier segunda detección</p></div>
-        </div>
-        <div class="prob-card">
-          <div class="prob-s"><h4>🐛 Problema</h4><p>Al terminar un cliente no aparecía el siguiente — no había mecanismo de reposición</p></div>
-          <div class="sol-s"><h4>✅ Solución</h4><p><code>ClienteTerminado()</code> → reset + Delay 2s → nuevo <code>SpawnearCliente()</code></p></div>
-        </div>
-        <div class="prob-card">
-          <div class="prob-s"><h4>🐛 Problema</h4><p>Cualquier actor que entrase en BP_ZonaEntrega activaba la finalización incorrectamente</p></div>
-          <div class="sol-s"><h4>✅ Solución</h4><p>Cast específico a <code>BP_BolsaCompra</code> — si falla el cast, la zona ignora el actor</p></div>
-        </div>
+        <div class="prob-card"><div class="prob-s"><h4>🐛 Problema</h4><p>Un mismo cliente generaba varios pedidos al entrar varias veces en la zona de espera</p></div><div class="sol-s"><h4>✅ Solución</h4><p>Flag booleano <code>PedidoYaGenerado</code> — solo lanza GenerarCompra() si es <code>false</code></p></div></div>
+        <div class="prob-card"><div class="prob-s"><h4>🐛 Problema</h4><p>Un producto se sumaba al total varias veces si entraba y salía del volumen del escáner</p></div><div class="sol-s"><h4>✅ Solución</h4><p>Flag por producto: <code>YaEscaneado</code> — bloquea cualquier segunda detección</p></div></div>
+        <div class="prob-card"><div class="prob-s"><h4>🐛 Problema</h4><p>Al terminar un cliente no aparecía el siguiente — no había mecanismo de reposición</p></div><div class="sol-s"><h4>✅ Solución</h4><p><code>ClienteTerminado()</code> → reset + Delay 2s → nuevo <code>SpawnearCliente()</code></p></div></div>
+        <div class="prob-card"><div class="prob-s"><h4>🐛 Problema</h4><p>Cualquier actor que entrase en BP_ZonaEntrega activaba la finalización incorrectamente</p></div><div class="sol-s"><h4>✅ Solución</h4><p>Cast específico a <code>BP_BolsaCompra</code> — si falla el cast, la zona ignora el actor</p></div></div>
       </div>
     </div>
   </div>
 
-  <!-- ══ SLIDE 11 · FIN ══ -->
+  <!-- ══ 11 · FIN ══ -->
   <div class="slide fin" data-index="10">
     <div class="fin-bg"></div>
-    <span class="float" style="font-size:68px">🎮</span>
+    <img src="LogoTFGFondoNegro.png" class="fin-logo" alt="NH VR Experiences" style="filter:invert(0);border-radius:8px;">
     <h2>¡Demo en vivo!</h2>
-    <p>Cajero 231 · Simulador VR de Supermercado · Unreal Engine 5</p>
+    <p class="fin-name">Cajero 231 · Simulador VR · Unreal Engine 5</p>
     <div class="fin-stats">
       <div class="stat"><div class="sv" style="color:var(--blue)">8</div><div class="sl">Blueprints</div></div>
       <div class="stat"><div class="sv" style="color:var(--green)">1–6</div><div class="sl">Productos / cliente</div></div>
       <div class="stat"><div class="sv" style="color:var(--orange)">4</div><div class="sl">Bugs resueltos</div></div>
       <div class="stat"><div class="sv" style="color:var(--purple)">∞</div><div class="sl">Flujo de clientes</div></div>
     </div>
-    <button class="trailer-btn" onclick="openTrailer()" style="margin-top:8px;">
-      <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px;"><path d="M8 5v14l11-7z"/></svg>
+    <div class="fin-logos">
+      <img src="UCV.png" alt="UCV">
+      <img src="Unreal.svg" alt="Unreal Engine">
+    </div>
+    <button class="trailer-btn" onclick="openTrailer()" style="margin-top:4px;padding:9px 22px;font-size:13px;">
+      <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;"><path d="M8 5v14l11-7z"/></svg>
       Ver Tráiler otra vez
     </button>
   </div>
 
 </div><!-- /presentation -->
 
-<!-- ══════════════════════════════
-     NAV
-══════════════════════════════ -->
+<!-- ══ NAV ══ -->
 <div class="nav">
   <button class="nav-btn" id="btn-prev" onclick="prev()" disabled>←</button>
   <div class="dots" id="dots"></div>
@@ -753,189 +477,182 @@ body::before {
   <button class="nav-btn" id="btn-next" onclick="next()">→</button>
 </div>
 
-<!-- ══════════════════════════════
-     LIGHTBOX
-══════════════════════════════ -->
+<!-- ══ LIGHTBOX ══ -->
 <div class="lb" id="lb" onclick="closeLB()">
   <button class="lb-close" onclick="closeLB()">×</button>
   <img id="lb-img" src="" alt="" onclick="event.stopPropagation()">
 </div>
 
-<!-- ══════════════════════════════
-     TRAILER
-══════════════════════════════ -->
+<!-- ══ TRAILER ══ -->
+<audio id="t-audio" src="music/trailer.mp3" preload="auto" loop></audio>
+
 <div id="trailer">
   <div class="t-watermark">CAJERO 231 · VR · UNREAL ENGINE 5</div>
   <div id="t-scenes"></div>
   <div class="t-progress"><div class="t-progress-fill" id="t-bar"></div></div>
   <div class="t-dots" id="t-dots"></div>
-  <button class="t-skip" onclick="skipTrailer()">SKIP ›</button>
-  <button class="t-close" id="t-close" onclick="closeTrailer()">×</button>
+  <div class="t-music" id="t-music-ind">
+    <div class="t-music-bars">
+      <div class="t-music-bar"></div><div class="t-music-bar"></div>
+      <div class="t-music-bar"></div><div class="t-music-bar"></div>
+      <div class="t-music-bar"></div>
+    </div>
+    <span>Fuzzeke — Without A Care</span>
+  </div>
+  <button class="t-skip" id="t-skip" onclick="skipTrailer()">SKIP ›</button>
+  <button class="t-close" id="t-close" onclick="closeTrailer()">✕ CERRAR</button>
 </div>
 
-<!-- ══════════════════════════════
-     SCRIPTS
-══════════════════════════════ -->
 <script>
-/* ─── Slides ─── */
+/* ── SLIDES ── */
 const slides = Array.from(document.querySelectorAll('.slide'));
 const N = slides.length;
 let cur = 0;
-const dotsEl    = document.getElementById('dots');
+const dotsEl = document.getElementById('dots');
 const counterEl = document.getElementById('counter');
-const btnPrev   = document.getElementById('btn-prev');
-const btnNext   = document.getElementById('btn-next');
+const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
 
 slides.forEach((_,i) => {
   const d = document.createElement('div');
-  d.className = 'dot' + (i===0?' active':'');
+  d.className = 'dot'+(i===0?' active':'');
   d.onclick = () => go(i);
   dotsEl.appendChild(d);
 });
-
 function ui() {
-  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===cur));
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active',i===cur));
   counterEl.textContent = `${cur+1} / ${N}`;
-  btnPrev.disabled = cur===0;
-  btnNext.disabled = cur===N-1;
+  btnPrev.disabled = cur===0; btnNext.disabled = cur===N-1;
 }
-function go(n) {
-  if (n<0||n>=N||n===cur) return;
-  slides[cur].classList.remove('active');
-  cur=n; slides[cur].classList.add('active'); ui();
-}
-function next() { go(cur+1); }
-function prev() { go(cur-1); }
+function go(n) { if(n<0||n>=N||n===cur) return; slides[cur].classList.remove('active'); cur=n; slides[cur].classList.add('active'); ui(); }
+function next() { go(cur+1); } function prev() { go(cur-1); }
 
 document.addEventListener('keydown', e => {
-  if (document.getElementById('lb').classList.contains('open')) { if(e.key==='Escape') closeLB(); return; }
-  if (document.getElementById('trailer').classList.contains('open')) { if(e.key==='Escape') closeTrailer(); return; }
-  if (e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ') { e.preventDefault(); next(); }
-  if (e.key==='ArrowLeft' ||e.key==='ArrowUp')                { e.preventDefault(); prev(); }
+  if(document.getElementById('lb').classList.contains('open')) { if(e.key==='Escape') closeLB(); return; }
+  if(document.getElementById('trailer').classList.contains('open')) { if(e.key==='Escape') closeTrailer(); return; }
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ') { e.preventDefault(); next(); }
+  if(e.key==='ArrowLeft' ||e.key==='ArrowUp')                { e.preventDefault(); prev(); }
 });
-
 let tx=0;
 document.addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
 document.addEventListener('touchend',e=>{ const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>50) dx<0?next():prev(); },{passive:true});
 
-/* ─── Lightbox ─── */
+/* ── LIGHTBOX ── */
 function openLB(src) { document.getElementById('lb-img').src=src; document.getElementById('lb').classList.add('open'); }
 function closeLB()   { document.getElementById('lb').classList.remove('open'); document.getElementById('lb-img').src=''; }
 
-/* ─── TRAILER ─── */
+/* ── TRAILER ── */
 const SCENES = [
-  { img:'imgs/ss/00003.png', title:'UN SUPERMERCADO.',      sub:'' },
-  { img:'imgs/ss/00011.png', title:'TU ÚNICA MISIÓN.',      sub:'' },
-  { img:'imgs/ss/00000.png', title:'LOS CLIENTES LLEGAN.',  sub:'' },
-  { img:'imgs/ss/00001.png', title:'ESCANEA SUS PRODUCTOS.',sub:'El precio sube en tiempo real' },
-  { img:'imgs/ss/00005.png', title:'',                      sub:'' },
-  { img:'imgs/ss/00006.png', title:'CADA PRODUCTO CUENTA.', sub:'' },
-  { img:'imgs/ss/00007.png', title:'',                      sub:'' },
-  { img:'imgs/ss/00010.png', title:'PRECIO: 2,00 €',        sub:'Actualizado en pantalla' },
-  { img:'imgs/ss/00008.png', title:'ENTREGA LA BOLSA.',     sub:'El cliente puede marcharse' },
-  { img:'imgs/ss/00002.png', title:'',                      sub:'' },
-  { img:'imgs/ss/00004.png', title:'',                      sub:'' },
-  { img: null,               title:'CAJERO 231',            sub:'Simulador VR · Unreal Engine 5', isTitle:true },
+  { img:'imgs/ss/00003.png', title:'UN SUPERMERCADO.',       sub:'' },
+  { img:'imgs/ss/00011.png', title:'TU ÚNICA MISIÓN.',       sub:'' },
+  { img:'imgs/ss/00000.png', title:'LOS CLIENTES LLEGAN.',   sub:'' },
+  { img:'imgs/ss/00001.png', title:'ESCANEA SUS PRODUCTOS.', sub:'El precio sube en tiempo real' },
+  { img:'imgs/ss/00005.png', title:'',                       sub:'' },
+  { img:'imgs/ss/00006.png', title:'CADA PRODUCTO CUENTA.',  sub:'' },
+  { img:'imgs/ss/00007.png', title:'',                       sub:'' },
+  { img:'imgs/ss/00010.png', title:'PRECIO: 2,00 €',         sub:'Actualizado en pantalla' },
+  { img:'imgs/ss/00008.png', title:'ENTREGA LA BOLSA.',      sub:'El cliente puede marcharse' },
+  { img:'imgs/ss/00002.png', title:'',                       sub:'' },
+  { img:'imgs/ss/00004.png', title:'',                       sub:'' },
+  { img: null, isTitle:true },
 ];
+const SCENE_DUR = 3500;
+let tTimer = null, tCurrent = 0;
+const audio = document.getElementById('t-audio');
+let audioFadeTimer = null;
 
-const SCENE_DUR = 3400; // ms per scene
-let tTimer = null;
-let tCurrent = 0;
-let tRunning = false;
+function audioFadeIn() {
+  clearInterval(audioFadeTimer);
+  audio.volume = 0; audio.play().catch(()=>{});
+  audioFadeTimer = setInterval(() => {
+    if (audio.volume < 0.78) audio.volume = Math.min(0.78, audio.volume + 0.04);
+    else clearInterval(audioFadeTimer);
+  }, 80);
+}
+function audioFadeOut(cb) {
+  clearInterval(audioFadeTimer);
+  audioFadeTimer = setInterval(() => {
+    if (audio.volume > 0.03) audio.volume = Math.max(0, audio.volume - 0.06);
+    else { clearInterval(audioFadeTimer); audio.pause(); audio.currentTime = 0; if(cb) cb(); }
+  }, 60);
+}
 
 function buildTrailer() {
   const container = document.getElementById('t-scenes');
   const dotsEl2   = document.getElementById('t-dots');
-  container.innerHTML = '';
-  dotsEl2.innerHTML   = '';
-
-  SCENES.forEach((sc, i) => {
+  container.innerHTML = ''; dotsEl2.innerHTML = '';
+  SCENES.forEach((sc,i) => {
     const scene = document.createElement('div');
-    scene.className = 't-scene' + (sc.isTitle ? ' title-card' : '');
+    scene.className = 't-scene'+(sc.isTitle?' title-card':'');
     scene.id = `tsc-${i}`;
-
     if (sc.isTitle) {
       scene.innerHTML = `
-        <div class="t-tc-title">${sc.title}</div>
-        <div class="t-tc-sub">${sc.sub}</div>
-        <div class="t-tc-engine">
-          <div class="t-tc-chip">Unreal Engine 5</div>
+        <img class="t-tc-logo" src="LogoDorado.png" alt="NH">
+        <div class="t-tc-title">CAJERO 231</div>
+        <div class="t-tc-sub">SIMULADOR VR · UNREAL ENGINE 5</div>
+        <div class="t-tc-chips">
+          <div class="t-tc-chip"><img src="Unreal.svg" alt="">Unreal Engine 5</div>
           <div class="t-tc-chip">Blueprints</div>
           <div class="t-tc-chip">VR</div>
+        </div>
+        <div class="t-tc-studio">
+          <img src="LogoDorado.png" alt="NH">
+          <span>Nacho &amp; Hugo VR Experiences</span>
         </div>`;
     } else {
       scene.innerHTML = `
         <img class="t-img" src="${sc.img}" alt="">
         <div class="t-overlay"></div>
-        ${sc.title||sc.sub ? `<div class="t-text"><div class="t-title">${sc.title}</div>${sc.sub?`<div class="t-sub">${sc.sub}</div>`:''}</div>` : ''}`;
+        ${sc.title||sc.sub?`<div class="t-text"><div class="t-title">${sc.title}</div>${sc.sub?`<div class="t-sub">${sc.sub}</div>`:''}</div>`:''}`;
     }
     container.appendChild(scene);
-
-    const dot = document.createElement('div');
-    dot.className = 't-dot';
-    dotsEl2.appendChild(dot);
+    const dot = document.createElement('div'); dot.className='t-dot'; dotsEl2.appendChild(dot);
   });
 }
 
 function tSetScene(n) {
   tCurrent = n;
-  document.querySelectorAll('.t-scene').forEach((s,i) => s.classList.toggle('active', i===n));
-  document.querySelectorAll('.t-dot').forEach((d,i) => d.classList.toggle('active', i===n));
-
-  // Progress bar for this scene
+  document.querySelectorAll('.t-scene').forEach((s,i) => s.classList.toggle('active',i===n));
+  document.querySelectorAll('.t-dot').forEach((d,i)   => d.classList.toggle('active',i===n));
   const bar = document.getElementById('t-bar');
-  bar.style.transition = 'none';
-  bar.style.width = '0%';
-  const isLast = n === SCENES.length - 1;
+  bar.style.transition='none'; bar.style.width='0%';
+  const isLast = n === SCENES.length-1;
   if (!isLast) {
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      bar.style.transition = `width ${SCENE_DUR}ms linear`;
-      bar.style.width = '100%';
-    }));
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ bar.style.transition=`width ${SCENE_DUR}ms linear`; bar.style.width='100%'; }));
   } else {
-    bar.style.width = '100%';
+    bar.style.width='100%';
     document.getElementById('t-close').classList.add('show');
-    document.querySelector('.t-skip').style.display = 'none';
+    document.getElementById('t-skip').style.display='none';
+    document.getElementById('t-music-ind').style.display='none';
+    audioFadeOut();
   }
-
-  // Re-trigger Ken Burns on new img
   const img = document.querySelector(`#tsc-${n} .t-img`);
-  if (img) { img.style.animation='none'; void img.offsetWidth; img.style.animation='kenburns 5s ease-out forwards'; }
-
-  // Re-trigger text animation
+  if(img){ img.style.animation='none'; void img.offsetWidth; img.style.animation='kenburns 5.5s ease-out forwards'; }
   const txt = document.querySelector(`#tsc-${n} .t-text`);
-  if (txt) { txt.style.animation='none'; void txt.offsetWidth; txt.style.animation='fadeUp 0.7s ease-out forwards'; }
+  if(txt){ txt.style.animation='none'; void txt.offsetWidth; txt.style.animation='fadeUp 0.7s ease-out forwards'; }
 }
 
 function tNext() {
-  if (tCurrent < SCENES.length-1) {
-    tSetScene(tCurrent+1);
-    tTimer = setTimeout(tNext, SCENE_DUR);
-  } else {
-    clearTimeout(tTimer);
-  }
+  if (tCurrent < SCENES.length-1) { tSetScene(tCurrent+1); tTimer=setTimeout(tNext,SCENE_DUR); }
+  else { clearTimeout(tTimer); }
 }
 
 function openTrailer() {
-  buildTrailer();
-  tCurrent = 0;
-  tRunning = true;
+  buildTrailer(); tCurrent=0;
   document.getElementById('trailer').classList.add('open');
-  document.querySelector('.t-skip').style.display = '';
+  document.getElementById('t-skip').style.display='';
   document.getElementById('t-close').classList.remove('show');
+  document.getElementById('t-music-ind').style.display='flex';
   tSetScene(0);
-  tTimer = setTimeout(tNext, SCENE_DUR);
+  tTimer=setTimeout(tNext,SCENE_DUR);
+  audioFadeIn();
 }
 
-function skipTrailer() {
-  clearTimeout(tTimer);
-  tSetScene(SCENES.length-1);
-}
+function skipTrailer() { clearTimeout(tTimer); tSetScene(SCENES.length-1); }
 
 function closeTrailer() {
   clearTimeout(tTimer);
-  tRunning = false;
-  document.getElementById('trailer').classList.remove('open');
+  audioFadeOut(() => { document.getElementById('trailer').classList.remove('open'); });
 }
 </script>
 </body>
